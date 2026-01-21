@@ -12,6 +12,7 @@ import Committees from "./pages/Committees";
 import CommitteeDetail from "./pages/CommitteeDetail";
 import Countries from "./pages/Countries";
 import Conference from "./pages/Conference";
+import Resources from "./pages/Resources";
 import ResourcesPolicyHandbook from "./pages/ResourcesPolicyHandbook";
 import ResourcesSpeaking from "./pages/ResourcesSpeaking";
 import ResourcesRules from "./pages/ResourcesRules";
@@ -25,6 +26,7 @@ import AdminDelegates from "./pages/admin/AdminDelegates";
 import AdminPartnerships from "./pages/admin/AdminPartnerships";
 import AdminVolunteers from "./pages/admin/AdminVolunteers";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminProposals from "./pages/admin/AdminProposals";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,13 +43,18 @@ const App = () => (
             <Route path="/about" element={<About />} />
             <Route path="/about/conference" element={<AboutConference />} />
             <Route path="/about/secretariat" element={<AboutSecretariat />} />
+            <Route path="/resources" element={<Resources />} />
+            <Route path="/resources/committees" element={<Committees />} />
+            <Route path="/resources/committees/:id" element={<CommitteeDetail />} />
+            <Route path="/resources/countries" element={<Countries />} />
+            <Route path="/resources/policy-handbook" element={<ResourcesPolicyHandbook />} />
+            <Route path="/resources/speaking" element={<ResourcesSpeaking />} />
+            <Route path="/resources/rules" element={<ResourcesRules />} />
+            {/* Legacy routes for backward compatibility */}
             <Route path="/committees" element={<Committees />} />
             <Route path="/committees/:id" element={<CommitteeDetail />} />
             <Route path="/countries" element={<Countries />} />
             <Route path="/conference" element={<Conference />} />
-            <Route path="/resources/policy-handbook" element={<ResourcesPolicyHandbook />} />
-            <Route path="/resources/speaking" element={<ResourcesSpeaking />} />
-            <Route path="/resources/rules" element={<ResourcesRules />} />
             <Route path="/get-involved" element={<GetInvolved />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
@@ -55,6 +62,7 @@ const App = () => (
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminOverview />} />
               <Route path="delegates" element={<AdminDelegates />} />
+              <Route path="proposals" element={<AdminProposals />} />
               <Route path="partnerships" element={<AdminPartnerships />} />
               <Route path="volunteers" element={<AdminVolunteers />} />
               <Route path="settings" element={<AdminSettings />} />

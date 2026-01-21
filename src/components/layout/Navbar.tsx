@@ -21,13 +21,12 @@ const navItems: NavItem[] = [
       { name: 'Our Secretariat', path: '/about/secretariat' },
     ]
   },
-  { name: 'Committees', path: '/committees' },
-  { name: 'Countries & Institutions', path: '/countries' },
   { 
-    name: 'Delegate Resources', 
+    name: 'Conference Resources', 
     children: [
-      { name: 'Policy Handbook', path: '/resources/policy-handbook' },
-      { name: 'Speaking Resources', path: '/resources/speaking' },
+      { name: 'Committees', path: '/resources/committees' },
+      { name: 'Countries & Institutions', path: '/resources/countries' },
+      { name: 'Delegate Resources', path: '/resources' },
       { name: 'Rules & Procedures', path: '/resources/rules' },
     ]
   },

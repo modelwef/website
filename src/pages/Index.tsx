@@ -5,6 +5,8 @@ import { Layout } from '@/components/layout/Layout';
 import { CountdownTimer } from '@/components/ui/CountdownTimer';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { CommitteeCard } from '@/components/cards/CommitteeCard';
+import { StatsSection } from '@/components/ui/StatsSection';
+import { SecretariatCarousel } from '@/components/ui/SecretariatCarousel';
 import { committees } from '@/data/committees';
 import heroBg from '@/assets/hero-bg.jpg';
 
@@ -80,7 +82,7 @@ const Index = () => {
                 <ArrowRight size={20} />
               </Link>
               <Link
-                to="/committees"
+                to="/resources/committees"
                 className="inline-flex items-center justify-center gap-2 border-2 border-white/80 text-white font-semibold px-8 py-4 rounded-md text-lg transition-all duration-200 hover:bg-white hover:text-primary"
               >
                 Explore Committees
@@ -105,6 +107,9 @@ const Index = () => {
           </div>
         </motion.div>
       </section>
+
+      {/* Stats Section */}
+      <StatsSection />
 
       {/* What is MWEF */}
       <section className="py-20 md:py-28 bg-background">
@@ -219,7 +224,7 @@ const Index = () => {
             className="text-center mt-10"
           >
             <Link
-              to="/committees"
+              to="/resources/committees"
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-6 py-3 rounded-md transition-all duration-200 hover:opacity-90"
             >
               View All Committees
@@ -229,8 +234,11 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Secretariat Carousel */}
+      <SecretariatCarousel />
+
       {/* Who Can Participate */}
-      <section className="py-20 md:py-28 bg-background">
+      <section className="py-20 md:py-28 bg-secondary">
         <div className="section-container">
           <div className="max-w-4xl mx-auto text-center">
             <SectionHeader

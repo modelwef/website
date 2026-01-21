@@ -10,13 +10,15 @@ import {
   Settings,
   LogOut,
   ChevronLeft,
-  Shield
+  Shield,
+  FileText
 } from 'lucide-react';
 import mwefLogo from '@/assets/mwef-logo.png';
 
 const navItems = [
   { name: 'Overview', path: '/admin', icon: LayoutDashboard },
   { name: 'Delegates', path: '/admin/delegates', icon: Users },
+  { name: 'Proposals', path: '/admin/proposals', icon: FileText },
   { name: 'Partnerships', path: '/admin/partnerships', icon: Building2 },
   { name: 'Volunteers', path: '/admin/volunteers', icon: UserCheck },
   { name: 'Settings', path: '/admin/settings', icon: Settings },

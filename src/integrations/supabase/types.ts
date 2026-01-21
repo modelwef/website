@@ -104,6 +104,59 @@ export type Database = {
         }
         Relationships: []
       }
+      policy_proposals: {
+        Row: {
+          created_at: string
+          description: string | null
+          feedback: string | null
+          file_name: string | null
+          file_url: string | null
+          id: string
+          registration_id: string | null
+          status: string
+          submitted_at: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          feedback?: string | null
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          registration_id?: string | null
+          status?: string
+          submitted_at?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          feedback?: string | null
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          registration_id?: string | null
+          status?: string
+          submitted_at?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "policy_proposals_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "delegate_registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

@@ -130,9 +130,11 @@ export const Navbar = () => {
                 Login
               </Link>
             )}
-            <Link to="/register" className="bg-accent text-accent-foreground font-semibold px-5 py-2.5 rounded-md text-sm transition-all duration-200 hover:opacity-90">
-              Register Now
-            </Link>
+            {!user && (
+              <Link to="/register" className="bg-accent text-accent-foreground font-semibold px-5 py-2.5 rounded-md text-sm transition-all duration-200 hover:opacity-90">
+                Register Now
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -185,9 +187,11 @@ export const Navbar = () => {
                     Login
                   </Link>
                 )}
-                <Link to="/register" className="block text-center bg-accent text-accent-foreground font-semibold px-5 py-3 rounded-md">
-                  Register Now
-                </Link>
+                {!user && (
+                  <Link to="/register" className="block text-center bg-accent text-accent-foreground font-semibold px-5 py-3 rounded-md">
+                    Register Now
+                  </Link>
+                )}
               </div>
             </div>
           </motion.div>

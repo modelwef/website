@@ -74,7 +74,7 @@ const About = () => {
                 transition={{ delay: index * 0.1 }}
                 className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6"
               >
-                <h4 className="font-semibold text-lg mb-2">{item.title}</h4>
+                <h4 className="font-semibold text-lg mb-2 text-primary-foreground">{item.title}</h4>
                 <p className="text-white/70 text-sm">{item.desc}</p>
               </motion.div>
             ))}

@@ -68,7 +68,7 @@ const Committees = () => {
         <div className="section-container">
           <div className="max-w-3xl mx-auto text-center">
             <div className="accent-bar mx-auto mb-6" />
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">How Committees Work</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-primary-foreground">How Committees Work</h2>
             <p className="text-white/80 text-lg leading-relaxed mb-8">
               Committees are used for Round 1 (Solution Proposal Round). Round 2 topics are decided internally within each committee, featuring structured 5 vs 5 proposition and opposition debates on policy implementations relevant to the committee's domain.
             </p>

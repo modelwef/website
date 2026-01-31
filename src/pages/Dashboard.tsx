@@ -5,7 +5,7 @@ import { Layout } from '@/components/layout/Layout';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { User, FileText, Globe, Calendar, LogOut, Edit, Upload, Send, X, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { User, FileText, Globe, Calendar, LogOut, Edit, Upload, Send, X, CheckCircle, Clock, AlertCircle, BookOpen, Landmark, ListChecks } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Registration {
@@ -524,21 +524,24 @@ const Dashboard = () => {
                 <div className="space-y-2">
                   <Link
                     to="/resources"
-                    className="block w-full text-left px-4 py-3 rounded-md bg-secondary hover:bg-secondary/80 text-foreground transition-colors"
+                    className="flex w-full items-center gap-2 px-4 py-3 rounded-md bg-secondary hover:bg-secondary/80 text-foreground transition-colors"
                   >
-                    📚 View Resources
+                    <BookOpen size={18} className="text-accent" />
+                    <span>View Resources</span>
                   </Link>
                   <Link
                     to="/resources/committees"
-                    className="block w-full text-left px-4 py-3 rounded-md bg-secondary hover:bg-secondary/80 text-foreground transition-colors"
+                    className="flex w-full items-center gap-2 px-4 py-3 rounded-md bg-secondary hover:bg-secondary/80 text-foreground transition-colors"
                   >
-                    🏛️ Explore Committees
+                    <Landmark size={18} className="text-accent" />
+                    <span>Explore Committees</span>
                   </Link>
                   <Link
                     to="/about/conference"
-                    className="block w-full text-left px-4 py-3 rounded-md bg-secondary hover:bg-secondary/80 text-foreground transition-colors"
+                    className="flex w-full items-center gap-2 px-4 py-3 rounded-md bg-secondary hover:bg-secondary/80 text-foreground transition-colors"
                   >
-                    📋 Conference Structure
+                    <ListChecks size={18} className="text-accent" />
+                    <span>Conference Structure</span>
                   </Link>
                 </div>
               </motion.div>
@@ -550,7 +553,7 @@ const Dashboard = () => {
                 transition={{ delay: 0.3 }}
                 className="bg-primary text-primary-foreground rounded-lg p-6"
               >
-                <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <h3 className="font-semibold mb-4 flex items-center gap-2 text-primary-foreground">
                   <Calendar size={18} />
                   Important Dates
                 </h3>

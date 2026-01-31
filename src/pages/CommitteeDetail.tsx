@@ -42,7 +42,7 @@ const CommitteeDetail = () => {
             <span className="inline-block px-4 py-1.5 bg-accent/20 text-accent rounded-full text-sm font-medium mb-4">
               {committee.category}
             </span>
-            <h1 className="text-3xl md:text-5xl font-bold mb-2">
+            <h1 className="text-3xl md:text-5xl font-bold mb-2 text-primary-foreground">
               {committee.name}
             </h1>
             <p className="text-2xl text-white/60 font-bold">({committee.abbreviation})</p>

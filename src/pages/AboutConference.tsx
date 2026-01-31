@@ -93,7 +93,7 @@ const AboutConference = () => {
               { title: 'Trade-off Awareness', desc: 'Recognition and analysis of economic trade-offs' },
             ].map((item, index) => (
               <motion.div key={index} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.1 }} className="bg-white/5 border border-white/10 rounded-lg p-6">
-                <h4 className="font-semibold text-lg mb-2">{item.title}</h4>
+                <h4 className="font-semibold text-lg mb-2 text-primary-foreground">{item.title}</h4>
                 <p className="text-white/70 text-sm">{item.desc}</p>
               </motion.div>
             ))}

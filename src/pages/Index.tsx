@@ -6,7 +6,6 @@ import { CountdownTimer } from '@/components/ui/CountdownTimer';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { CommitteeCard } from '@/components/cards/CommitteeCard';
 import { StatsSection } from '@/components/ui/StatsSection';
-import { SecretariatCarousel } from '@/components/ui/SecretariatCarousel';
 import { committees } from '@/data/committees';
 import heroBg from '@/assets/hero-bg.jpg';
 
@@ -233,9 +232,6 @@ const Index = () => {
           </motion.div>
         </div>
       </section>
-
-      {/* Secretariat Carousel */}
-      <SecretariatCarousel />
 
       {/* Who Can Participate */}
       <section className="py-20 md:py-28 bg-secondary">

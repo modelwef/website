@@ -8,7 +8,9 @@ import { allCountries, institutions } from '@/data/countries';
 
 interface Delegate {
   id: string;
-  user_id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
   delegation_type: string;
   preferred_country: string | null;
   preferred_institution: string | null;
@@ -89,7 +91,11 @@ const AdminDelegates = () => {
   };
 
   const filteredDelegates = delegates.filter(delegate => {
-    const matchesSearch = delegate.user_id.includes(searchTerm.toLowerCase());
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+    const delegateName = `${delegate.first_name} ${delegate.last_name}`.trim().toLowerCase();
+    const matchesSearch = !normalizedSearch
+      || delegate.email.toLowerCase().includes(normalizedSearch)
+      || delegateName.includes(normalizedSearch);
     const matchesStatus = statusFilter === 'all' || delegate.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -152,7 +158,7 @@ const AdminDelegates = () => {
             <table className="w-full">
               <thead className="bg-secondary">
                 <tr>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-foreground">ID</th>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-foreground">Delegate</th>
                   <th className="text-left px-4 py-3 text-sm font-medium text-foreground">Preference</th>
                   <th className="text-left px-4 py-3 text-sm font-medium text-foreground">Assignment</th>
                   <th className="text-left px-4 py-3 text-sm font-medium text-foreground">Status</th>
@@ -162,7 +168,12 @@ const AdminDelegates = () => {
               <tbody className="divide-y divide-border">
                 {filteredDelegates.map((delegate) => (
                   <motion.tr key={delegate.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-secondary/50">
-                    <td className="px-4 py-4 text-sm text-muted-foreground">{delegate.id.slice(0, 8)}...</td>
+                    <td className="px-4 py-4">
+                      <div className="text-sm">
+                        <p className="text-foreground">{delegate.first_name} {delegate.last_name}</p>
+                        <p className="text-muted-foreground">{delegate.email}</p>
+                      </div>
+                    </td>
                     <td className="px-4 py-4">
                       <div className="text-sm">
                         <p className="text-foreground capitalize">{delegate.delegation_type}</p>

@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Layout } from '@/components/layout/Layout';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { User, School, Mail, Lock, Globe, BookOpen, CreditCard, CheckCircle, ArrowRight } from 'lucide-react';
+import { User, School, Globe, BookOpen, CreditCard, CheckCircle, ArrowRight } from 'lucide-react';
 import { committees } from '@/data/committees';
 import { allCountries, institutions } from '@/data/countries';
 
@@ -14,8 +13,6 @@ const Register = () => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
-    password: '',
-    confirmPassword: '',
     school: '',
     grade: '',
     delegationType: 'country',
@@ -25,7 +22,6 @@ const Register = () => {
     agreeTerms: false,
   });
   const [loading, setLoading] = useState(false);
-  const { signUp, user } = useAuth();
   const navigate = useNavigate();
   const splitName = (fullName: string) => {
     const trimmed = fullName.trim();
@@ -41,57 +37,19 @@ const Register = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match');
-      return;
-    }
 
     if (!formData.agreeTerms) {
       toast.error('Please agree to the terms and conditions');
       return;
     }
 
-    if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters');
-      return;
-    }
-
     setLoading(true);
 
-    // Step 1: Create the user account
-    const { error: signUpError } = await signUp(formData.email, formData.password, formData.fullName);
-
-    if (signUpError) {
-      toast.error(signUpError.message);
-      setLoading(false);
-      return;
-    }
-
-    // Step 2: Wait a moment for the auth trigger to create profile
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // Step 3: Get the current session to get user id
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session?.user) {
-      toast.error('Account created but please login to complete registration');
-      setLoading(false);
-      navigate('/login');
-      return;
-    }
-
-    // Step 4: Update the profile with school and grade
-    await supabase
-      .from('profiles')
-      .update({
-        school: formData.school,
-        grade: formData.grade,
-      })
-      .eq('user_id', session.user.id);
-
-    // Step 5: Create the delegate registration
     const { firstName, lastName } = splitName(formData.fullName);
+    const notes = [
+      `School: ${formData.school}`,
+      `Grade: ${formData.grade}`,
+    ].join('\n');
     const { error: regError } = await supabase
       .from('delegate_registrations')
       .insert({
@@ -102,24 +60,19 @@ const Register = () => {
         preferred_country: formData.delegationType === 'country' ? formData.preferredCountry : null,
         preferred_institution: formData.delegationType === 'institution' ? formData.preferredInstitution : null,
         committee_preference: formData.committeePreference || null,
+        notes,
       });
 
     if (regError) {
       console.error('Registration error:', regError);
-      toast.error('Account created but registration failed. Please complete registration from your dashboard.');
+      toast.error('Registration failed. Please try again or contact support.');
     } else {
-      toast.success('Registration successful! Welcome to MWEF.');
+      toast.success('Registration submitted successfully! We will email you with next steps.');
     }
 
     setLoading(false);
-    navigate('/dashboard');
+    navigate('/');
   };
-
-  // If user is already logged in, redirect to dashboard
-  if (user) {
-    navigate('/dashboard');
-    return null;
-  }
 
   return (
     <Layout>
@@ -303,39 +256,6 @@ const Register = () => {
                   </div>
                 </div>
 
-                {/* Account Setup */}
-                <div className="mb-8">
-                  <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                    <Lock className="text-accent" size={20} />
-                    Account Setup
-                  </h3>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="form-label">Password *</label>
-                      <input
-                        type="password"
-                        className="form-input"
-                        value={formData.password}
-                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                        required
-                        minLength={6}
-                        placeholder="Min 6 characters"
-                      />
-                    </div>
-                    <div>
-                      <label className="form-label">Confirm Password *</label>
-                      <input
-                        type="password"
-                        className="form-input"
-                        value={formData.confirmPassword}
-                        onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                        required
-                        placeholder="Confirm password"
-                      />
-                    </div>
-                  </div>
-                </div>
-
                 {/* Terms */}
                 <div className="mb-8">
                   <label className="flex items-start gap-3 cursor-pointer">
@@ -356,20 +276,13 @@ const Register = () => {
                   disabled={loading}
                   className="w-full btn-primary text-lg py-4 flex items-center justify-center gap-2"
                 >
-                  {loading ? 'Creating Account...' : (
+                  {loading ? 'Submitting...' : (
                     <>
-                      Complete Registration
+                      Submit Registration
                       <ArrowRight size={20} />
                     </>
                   )}
                 </button>
-
-                <p className="text-center text-muted-foreground text-sm mt-4">
-                  Already have an account?{' '}
-                  <Link to="/login" className="text-accent hover:underline font-medium">
-                    Sign in here
-                  </Link>
-                </p>
               </form>
             </motion.div>
 

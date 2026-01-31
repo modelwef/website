@@ -5,7 +5,7 @@ import { Layout } from '@/components/layout/Layout';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { User, School, Globe, BookOpen, CreditCard, CheckCircle, ArrowRight, Lock } from 'lucide-react';
+import { User, School, Globe, BookOpen, CreditCard, CheckCircle, ArrowRight, Lock, Eye, EyeOff } from 'lucide-react';
 import { committees } from '@/data/committees';
 import { allCountries, institutions } from '@/data/countries';
 
@@ -24,6 +24,8 @@ const Register = () => {
     agreeTerms: false,
   });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
   const splitName = (fullName: string) => {
     const trimmed = fullName.trim();
@@ -139,28 +141,48 @@ const Register = () => {
                         <Lock size={16} className="text-accent" />
                         Password *
                       </label>
-                      <input
-                        type="password"
-                        className="form-input"
-                        value={formData.password}
-                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                        required
-                        placeholder="Create a password"
-                      />
+                      <div className="relative">
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          className="form-input pr-12"
+                          value={formData.password}
+                          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                          required
+                          placeholder="Create a password"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((prev) => !prev)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          aria-label={showPassword ? 'Hide password' : 'Show password'}
+                        >
+                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      </div>
                     </div>
                     <div>
                       <label className="form-label flex items-center gap-2">
                         <Lock size={16} className="text-accent" />
                         Confirm Password *
                       </label>
-                      <input
-                        type="password"
-                        className="form-input"
-                        value={formData.confirmPassword}
-                        onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                        required
-                        placeholder="Re-enter your password"
-                      />
+                      <div className="relative">
+                        <input
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          className="form-input pr-12"
+                          value={formData.confirmPassword}
+                          onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                          required
+                          placeholder="Re-enter your password"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword((prev) => !prev)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                        >
+                          {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -372,7 +394,7 @@ const Register = () => {
 
               {/* Important Dates */}
               <div
-                className="bg-primary text-primary-foreground rounded-lg p-6"
+                className="bg-primary text-white rounded-lg p-6"
               >
                 <h3 className="text-lg font-semibold mb-4">Important Dates</h3>
                 <ul className="space-y-3 text-sm">

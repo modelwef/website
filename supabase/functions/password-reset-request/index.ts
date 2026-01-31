@@ -38,7 +38,9 @@ serve(async (req) => {
     return jsonResponse({ error: "Method not allowed" }, 405);
   }
 
-  const { email } = await req.json();
+  const body = await req.json();
+  const email = (body?.email ?? "").toString().trim().toLowerCase();
+
 
   if (!email) {
     return jsonResponse({ error: "Email is required." }, 400);

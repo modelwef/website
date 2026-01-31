@@ -27,6 +27,7 @@ export type Database = {
           id: string
           last_name: string
           notes: string | null
+          password_hash: string | null
           payment_status: string
           preferred_country: string | null
           preferred_institution: string | null
@@ -45,6 +46,7 @@ export type Database = {
           id?: string
           last_name: string
           notes?: string | null
+          password_hash?: string | null
           payment_status?: string
           preferred_country?: string | null
           preferred_institution?: string | null
@@ -63,11 +65,39 @@ export type Database = {
           id?: string
           last_name?: string
           notes?: string | null
+          password_hash?: string | null
           payment_status?: string
           preferred_country?: string | null
           preferred_institution?: string | null
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      delegate_password_resets: {
+        Row: {
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          token_hash: string
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          token_hash: string
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          token_hash?: string
+          used_at?: string | null
         }
         Relationships: []
       }
@@ -267,12 +297,45 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      authenticate_delegate: {
+        Args: {
+          _email: string
+          _password: string
+        }
+        Returns: {
+          id: string
+          email: string
+          first_name: string
+          last_name: string
+        }[]
+      }
+      consume_delegate_password_reset: {
+        Args: {
+          _token: string
+          _new_password: string
+        }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      register_delegate: {
+        Args: {
+          _first_name: string
+          _last_name: string
+          _email: string
+          _password: string
+          _delegation_type: string
+          _preferred_country: string | null
+          _preferred_institution: string | null
+          _committee_preference: string | null
+          _notes: string | null
+        }
+        Returns: string
       }
     }
     Enums: {

@@ -5,7 +5,7 @@ import { Layout } from '@/components/layout/Layout';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { User, School, Globe, BookOpen, CreditCard, CheckCircle, ArrowRight } from 'lucide-react';
+import { User, School, Globe, BookOpen, CreditCard, CheckCircle, ArrowRight, Lock } from 'lucide-react';
 import { committees } from '@/data/committees';
 import { allCountries, institutions } from '@/data/countries';
 
@@ -13,6 +13,8 @@ const Register = () => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
+    password: '',
+    confirmPassword: '',
     school: '',
     grade: '',
     delegationType: 'country',
@@ -43,6 +45,11 @@ const Register = () => {
       return;
     }
 
+    if (formData.password !== formData.confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+
     setLoading(true);
 
     const { firstName, lastName } = splitName(formData.fullName);
@@ -50,18 +57,17 @@ const Register = () => {
       `School: ${formData.school}`,
       `Grade: ${formData.grade}`,
     ].join('\n');
-    const { error: regError } = await supabase
-      .from('delegate_registrations')
-      .insert({
-        first_name: firstName,
-        last_name: lastName,
-        email: formData.email,
-        delegation_type: formData.delegationType,
-        preferred_country: formData.delegationType === 'country' ? formData.preferredCountry : null,
-        preferred_institution: formData.delegationType === 'institution' ? formData.preferredInstitution : null,
-        committee_preference: formData.committeePreference || null,
-        notes,
-      });
+    const { error: regError } = await supabase.rpc('register_delegate', {
+      _first_name: firstName,
+      _last_name: lastName,
+      _email: formData.email,
+      _password: formData.password,
+      _delegation_type: formData.delegationType,
+      _preferred_country: formData.delegationType === 'country' ? formData.preferredCountry : null,
+      _preferred_institution: formData.delegationType === 'institution' ? formData.preferredInstitution : null,
+      _committee_preference: formData.committeePreference || null,
+      _notes: notes,
+    });
 
     if (regError) {
       console.error('Registration error:', regError);
@@ -71,7 +77,7 @@ const Register = () => {
     }
 
     setLoading(false);
-    navigate('/');
+    navigate('/login');
   };
 
   return (
@@ -124,6 +130,36 @@ const Register = () => {
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         required
                         placeholder="delegate@example.com"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <label className="form-label flex items-center gap-2">
+                        <Lock size={16} className="text-accent" />
+                        Password *
+                      </label>
+                      <input
+                        type="password"
+                        className="form-input"
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        required
+                        placeholder="Create a password"
+                      />
+                    </div>
+                    <div>
+                      <label className="form-label flex items-center gap-2">
+                        <Lock size={16} className="text-accent" />
+                        Confirm Password *
+                      </label>
+                      <input
+                        type="password"
+                        className="form-input"
+                        value={formData.confirmPassword}
+                        onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                        required
+                        placeholder="Re-enter your password"
                       />
                     </div>
                   </div>

@@ -1,11 +1,11 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Layout } from '@/components/layout/Layout';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { User, FileText, Globe, Calendar, Shield, LogOut, Edit, Upload, Send, X, CheckCircle, Clock, AlertCircle } from 'lucide-react';
+import { User, FileText, Globe, Calendar, LogOut, Edit, Upload, Send, X, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Registration {
@@ -23,6 +23,7 @@ interface Registration {
   status: string;
   payment_status: string;
   created_at: string;
+  notes: string | null;
 }
 
 interface PolicyProposal {
@@ -38,7 +39,7 @@ interface PolicyProposal {
 }
 
 const Dashboard = () => {
-  const { user, profile, isAdmin, loading, signOut } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const [registration, setRegistration] = useState<Registration | null>(null);
   const [proposals, setProposals] = useState<PolicyProposal[]>([]);
@@ -49,6 +50,19 @@ const Dashboard = () => {
   const [proposalFile, setProposalFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { schoolName, gradeLevel } = useMemo(() => {
+    if (!registration?.notes) {
+      return { schoolName: 'Not set', gradeLevel: 'Not set' };
+    }
+
+    const lines = registration.notes.split('\n');
+    const schoolLine = lines.find((line) => line.startsWith('School:'));
+    const gradeLine = lines.find((line) => line.startsWith('Grade:'));
+    return {
+      schoolName: schoolLine?.replace('School:', '').trim() || 'Not set',
+      gradeLevel: gradeLine?.replace('Grade:', '').trim() || 'Not set',
+    };
+  }, [registration]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -59,7 +73,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (!user) return;
-      const registrationEmail = user.email ?? profile?.email;
+      const registrationEmail = user.email;
       if (!registrationEmail) {
         setLoadingReg(false);
         return;
@@ -97,7 +111,7 @@ const Dashboard = () => {
     if (user) {
       fetchData();
     }
-  }, [user, profile]);
+  }, [user]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -223,7 +237,7 @@ const Dashboard = () => {
     <Layout>
       <PageHeader
         title="Delegate Dashboard"
-        subtitle={`Welcome back, ${profile?.full_name || 'Delegate'}!`}
+        subtitle={`Welcome back, ${user ? `${user.first_name} ${user.last_name}`.trim() : 'Delegate'}!`}
       />
 
       <section className="py-20 bg-background">
@@ -248,19 +262,21 @@ const Dashboard = () => {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-muted-foreground">Full Name</p>
-                    <p className="font-medium text-foreground">{profile?.full_name || 'Not set'}</p>
+                    <p className="font-medium text-foreground">
+                      {user ? `${user.first_name} ${user.last_name}`.trim() : 'Not set'}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Email</p>
-                    <p className="font-medium text-foreground">{profile?.email || user?.email}</p>
+                    <p className="font-medium text-foreground">{user?.email || 'Not set'}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">School</p>
-                    <p className="font-medium text-foreground">{profile?.school || 'Not set'}</p>
+                    <p className="font-medium text-foreground">{schoolName}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Grade</p>
-                    <p className="font-medium text-foreground">{profile?.grade || 'Not set'}</p>
+                    <p className="font-medium text-foreground">{gradeLevel}</p>
                   </div>
                 </div>
               </motion.div>
@@ -550,26 +566,6 @@ const Dashboard = () => {
                 </ul>
               </motion.div>
 
-              {/* Admin Access */}
-              {isAdmin && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="bg-accent/10 border border-accent/20 rounded-lg p-6"
-                >
-                  <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                    <Shield className="text-accent" size={18} />
-                    Admin Access
-                  </h3>
-                  <Link
-                    to="/admin"
-                    className="block w-full text-center btn-primary"
-                  >
-                    Go to Admin Dashboard
-                  </Link>
-                </motion.div>
-              )}
 
               {/* Sign Out */}
               <motion.div

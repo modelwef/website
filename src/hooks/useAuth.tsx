@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return { error };
     }
 
-    const delegate = Array.isArray(data) ? data[0] : data;
+    const delegate = Array.isArray(data) ? data[0] : null;
 
     if (!delegate) {
       return { error: new Error('Invalid email or password') };

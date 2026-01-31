@@ -22,14 +22,16 @@ export type Database = {
           committee_preference: string | null
           created_at: string
           delegation_type: string
+          email: string
+          first_name: string
           id: string
+          last_name: string
           notes: string | null
-          payment_status: string | null
+          payment_status: string
           preferred_country: string | null
           preferred_institution: string | null
-          status: Database["public"]["Enums"]["registration_status"]
+          status: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           assigned_committee?: string | null
@@ -38,14 +40,16 @@ export type Database = {
           committee_preference?: string | null
           created_at?: string
           delegation_type: string
+          email: string
+          first_name: string
           id?: string
+          last_name: string
           notes?: string | null
-          payment_status?: string | null
+          payment_status?: string
           preferred_country?: string | null
           preferred_institution?: string | null
-          status?: Database["public"]["Enums"]["registration_status"]
+          status?: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           assigned_committee?: string | null
@@ -54,14 +58,16 @@ export type Database = {
           committee_preference?: string | null
           created_at?: string
           delegation_type?: string
+          email?: string
+          first_name?: string
           id?: string
+          last_name?: string
           notes?: string | null
-          payment_status?: string | null
+          payment_status?: string
           preferred_country?: string | null
           preferred_institution?: string | null
-          status?: Database["public"]["Enums"]["registration_status"]
+          status?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }

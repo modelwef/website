@@ -10,6 +10,9 @@ import { toast } from 'sonner';
 
 interface Registration {
   id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
   delegation_type: string;
   preferred_country: string | null;
   preferred_institution: string | null;
@@ -56,12 +59,17 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (!user) return;
+      const registrationEmail = user.email ?? profile?.email;
+      if (!registrationEmail) {
+        setLoadingReg(false);
+        return;
+      }
       
       // Fetch registration
       const { data: regData, error: regError } = await supabase
         .from('delegate_registrations')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('email', registrationEmail)
         .maybeSingle();
 
       if (regError) {
@@ -89,7 +97,7 @@ const Dashboard = () => {
     if (user) {
       fetchData();
     }
-  }, [user]);
+  }, [user, profile]);
 
   const handleSignOut = async () => {
     await signOut();

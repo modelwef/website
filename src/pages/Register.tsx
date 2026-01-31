@@ -27,6 +27,17 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const { signUp, user } = useAuth();
   const navigate = useNavigate();
+  const splitName = (fullName: string) => {
+    const trimmed = fullName.trim();
+    if (!trimmed) {
+      return { firstName: '', lastName: '' };
+    }
+    const [firstName, ...rest] = trimmed.split(/\s+/);
+    return {
+      firstName,
+      lastName: rest.join(' '),
+    };
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,10 +91,13 @@ const Register = () => {
       .eq('user_id', session.user.id);
 
     // Step 5: Create the delegate registration
+    const { firstName, lastName } = splitName(formData.fullName);
     const { error: regError } = await supabase
       .from('delegate_registrations')
       .insert({
-        user_id: session.user.id,
+        first_name: firstName,
+        last_name: lastName,
+        email: formData.email,
         delegation_type: formData.delegationType,
         preferred_country: formData.delegationType === 'country' ? formData.preferredCountry : null,
         preferred_institution: formData.delegationType === 'institution' ? formData.preferredInstitution : null,

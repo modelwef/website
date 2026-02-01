@@ -44,7 +44,7 @@ const SystemLogin = () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/system`,
+        redirectTo: `${window.location.origin}/system/login`,
         queryParams: {
           prompt: 'select_account',
         },

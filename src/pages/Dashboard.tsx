@@ -5,7 +5,7 @@ import { Layout } from '@/components/layout/Layout';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { User, FileText, Globe, Calendar, LogOut, Edit, Upload, Send, X, CheckCircle, Clock, AlertCircle, BookOpen, Landmark, ListChecks } from 'lucide-react';
+import { User, FileText, Globe, Calendar, LogOut, Edit, Upload, Send, X, CheckCircle, Clock, AlertCircle, BookOpen, Landmark, ListChecks, ClipboardCheck, BadgeCheck } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Registration {
@@ -50,6 +50,13 @@ const Dashboard = () => {
   const [proposalFile, setProposalFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const proposalMetrics = useMemo(() => {
+    return {
+      total: proposals.length,
+      reviewed: proposals.filter((proposal) => proposal.status === 'reviewed').length,
+      submitted: proposals.filter((proposal) => proposal.status === 'submitted').length,
+    };
+  }, [proposals]);
   const { schoolName, gradeLevel } = useMemo(() => {
     if (!registration?.notes) {
       return { schoolName: 'Not set', gradeLevel: 'Not set' };
@@ -512,6 +519,42 @@ const Dashboard = () => {
 
             {/* Sidebar */}
             <div className="space-y-6">
+              {/* Delegation Snapshot */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+                className="bg-card border border-border rounded-lg p-6"
+                style={{ boxShadow: 'var(--shadow-card)' }}
+              >
+                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <Globe size={18} className="text-accent" />
+                  Delegation Snapshot
+                </h3>
+                {registration ? (
+                  <div className="space-y-3 text-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Registration</span>
+                      <span className="font-medium text-foreground capitalize">{registration.status}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Assigned Country</span>
+                      <span className="font-medium text-foreground">{registration.assigned_country || 'Pending'}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Committee</span>
+                      <span className="font-medium text-foreground">{registration.assigned_committee || 'Pending'}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Payment</span>
+                      <span className="font-medium text-foreground capitalize">{registration.payment_status || 'Pending'}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Complete registration to view assignments.</p>
+                )}
+              </motion.div>
+
               {/* Quick Actions */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -546,6 +589,34 @@ const Dashboard = () => {
                 </div>
               </motion.div>
 
+              {/* Progress Overview */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25 }}
+                className="bg-card border border-border rounded-lg p-6"
+                style={{ boxShadow: 'var(--shadow-card)' }}
+              >
+                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <ClipboardCheck size={18} className="text-accent" />
+                  Progress Overview
+                </h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Policy proposals</span>
+                    <span className="font-medium text-foreground">{proposalMetrics.total}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Submitted</span>
+                    <span className="font-medium text-foreground">{proposalMetrics.submitted}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Reviewed</span>
+                    <span className="font-medium text-foreground">{proposalMetrics.reviewed}</span>
+                  </div>
+                </div>
+              </motion.div>
+
               {/* Important Dates */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -569,6 +640,39 @@ const Dashboard = () => {
                 </ul>
               </motion.div>
 
+              {/* Delegate Checklist */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="bg-card border border-border rounded-lg p-6"
+                style={{ boxShadow: 'var(--shadow-card)' }}
+              >
+                <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <BadgeCheck size={18} className="text-accent" />
+                  Delegate Checklist
+                </h3>
+                <ul className="space-y-3 text-sm text-muted-foreground">
+                  <li className="flex items-center justify-between">
+                    <span>Registration submitted</span>
+                    <span className={registration ? 'text-accent' : 'text-muted-foreground'}>
+                      {registration ? 'Done' : 'Pending'}
+                    </span>
+                  </li>
+                  <li className="flex items-center justify-between">
+                    <span>Assignment received</span>
+                    <span className={(registration?.assigned_country || registration?.assigned_committee) ? 'text-accent' : 'text-muted-foreground'}>
+                      {(registration?.assigned_country || registration?.assigned_committee) ? 'Done' : 'Pending'}
+                    </span>
+                  </li>
+                  <li className="flex items-center justify-between">
+                    <span>Policy proposal</span>
+                    <span className={proposalMetrics.total > 0 ? 'text-accent' : 'text-muted-foreground'}>
+                      {proposalMetrics.total > 0 ? 'Submitted' : 'Pending'}
+                    </span>
+                  </li>
+                </ul>
+              </motion.div>
 
               {/* Sign Out */}
               <motion.div

@@ -29,6 +29,8 @@ import AdminPartnerships from "./pages/admin/AdminPartnerships";
 import AdminVolunteers from "./pages/admin/AdminVolunteers";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminProposals from "./pages/admin/AdminProposals";
+import SystemLogin from "./pages/system/SystemLogin";
+import SystemDashboard from "./pages/system/SystemDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -71,6 +73,8 @@ const App = () => (
               <Route path="volunteers" element={<AdminVolunteers />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
+            <Route path="/system/login" element={<SystemLogin />} />
+            <Route path="/system" element={<SystemDashboard />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

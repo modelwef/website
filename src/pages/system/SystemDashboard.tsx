@@ -68,13 +68,55 @@ interface VolunteerSignup {
 
 const SystemDashboard = () => {
   const navigate = useNavigate()
-  const [loading, setLoading] = useState(true)
-  const [authorized, setAuthorized] = useState(false)
+  const getCachedData = () => {
+    if (typeof window === "undefined") return null
+    try {
+      const cached = sessionStorage.getItem("systemDashboardData")
+      return cached ? JSON.parse(cached) : null
+    } catch {
+      return null
+    }
+  }
+
+  const getSavedColumns = (key: string) => {
+    if (typeof document === "undefined") return null
+    const cookieValue = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith(`${key}=`))
+      ?.split("=")[1]
+    if (!cookieValue) return null
+    try {
+      return JSON.parse(decodeURIComponent(cookieValue)) as Record<string, boolean>
+    } catch {
+      return null
+    }
+  }
+
+  const setColumnsCookie = (key: string, value: Record<string, boolean>) => {
+    if (typeof document === "undefined") return
+    document.cookie = `${key}=${encodeURIComponent(
+      JSON.stringify(value)
+    )}; path=/; max-age=31536000`
+  }
+
+  const cachedData = getCachedData()
+  const initialAuthorized =
+    typeof window !== "undefined" &&
+    sessionStorage.getItem("systemDashboardAuthorized") === "true"
+
+  const [loading, setLoading] = useState(!initialAuthorized)
+  const [authorized, setAuthorized] = useState(initialAuthorized)
   const [userEmail, setUserEmail] = useState<string | null>(null)
 
-  const [delegates, setDelegates] = useState<DelegateRegistration[]>([])
-  const [partnerships, setPartnerships] = useState<PartnershipApplication[]>([])
-  const [volunteers, setVolunteers] = useState<VolunteerSignup[]>([])
+  const [delegates, setDelegates] = useState<DelegateRegistration[]>(
+    cachedData?.delegates ?? []
+  )
+  const [partnerships, setPartnerships] = useState<PartnershipApplication[]>(
+    cachedData?.partnerships ?? []
+  )
+  const [volunteers, setVolunteers] = useState<VolunteerSignup[]>(
+    cachedData?.volunteers ?? []
+  )
 
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState({
@@ -83,7 +125,7 @@ const SystemDashboard = () => {
     status: "pending",
   })
 
-  const [delegateColumns, setDelegateColumns] = useState({
+  const defaultDelegateColumns = {
     delegate: true,
     delegation: true,
     preferences: true,
@@ -93,9 +135,9 @@ const SystemDashboard = () => {
     notes: true,
     created: true,
     actions: true,
-  })
+  }
 
-  const [partnershipColumns, setPartnershipColumns] = useState({
+  const defaultPartnershipColumns = {
     organization: true,
     contact: true,
     email: true,
@@ -103,9 +145,9 @@ const SystemDashboard = () => {
     status: true,
     message: true,
     created: true,
-  })
+  }
 
-  const [volunteerColumns, setVolunteerColumns] = useState({
+  const defaultVolunteerColumns = {
     name: true,
     email: true,
     role: true,
@@ -113,7 +155,22 @@ const SystemDashboard = () => {
     status: true,
     experience: true,
     created: true,
-  })
+  }
+
+  const [delegateColumns, setDelegateColumns] = useState(() => ({
+    ...defaultDelegateColumns,
+    ...(getSavedColumns("system-delegate-columns") ?? {}),
+  }))
+
+  const [partnershipColumns, setPartnershipColumns] = useState(() => ({
+    ...defaultPartnershipColumns,
+    ...(getSavedColumns("system-partnership-columns") ?? {}),
+  }))
+
+  const [volunteerColumns, setVolunteerColumns] = useState(() => ({
+    ...defaultVolunteerColumns,
+    ...(getSavedColumns("system-volunteer-columns") ?? {}),
+  }))
 
   const delegateColumnOptions = [
     { key: "delegate", label: "Delegate" },
@@ -241,13 +298,16 @@ const SystemDashboard = () => {
   }
 
   const handleAccessCheck = async () => {
-    setLoading(true)
+    if (!sessionStorage.getItem("systemDashboardAuthorized")) {
+      setLoading(true)
+    }
 
     const { data: userData } = await supabase.auth.getUser()
     const email = userData.user?.email?.toLowerCase() ?? null
 
     if (!email) {
       setAuthorized(false)
+      sessionStorage.removeItem("systemDashboardAuthorized")
       setUserEmail(null)
       setLoading(false)
       navigate("/system/login", { replace: true })
@@ -261,31 +321,29 @@ const SystemDashboard = () => {
     if (!isAdmin) {
       await supabase.auth.signOut()
       setAuthorized(false)
+      sessionStorage.removeItem("systemDashboardAuthorized")
       setLoading(false)
       return
     }
 
     setAuthorized(true)
-    const cached = sessionStorage.getItem("systemDashboardData")
+    sessionStorage.setItem("systemDashboardAuthorized", "true")
+    const cached = getCachedData()
     if (cached) {
-      const parsed = JSON.parse(cached) as {
-        delegates: DelegateRegistration[]
-        partnerships: PartnershipApplication[]
-        volunteers: VolunteerSignup[]
-      }
-      setDelegates(parsed.delegates ?? [])
-      setPartnerships(parsed.partnerships ?? [])
-      setVolunteers(parsed.volunteers ?? [])
+      setDelegates(cached.delegates ?? [])
+      setPartnerships(cached.partnerships ?? [])
+      setVolunteers(cached.volunteers ?? [])
       setLoading(false)
-    } else {
-      await fetchAllData()
+      return
     }
+    await fetchAllData()
   }
 
   useEffect(() => {
     void handleAccessCheck()
 
-    const { data } = supabase.auth.onAuthStateChange(() => {
+    const { data } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "INITIAL_SESSION") return
       void handleAccessCheck()
     })
 
@@ -295,9 +353,22 @@ const SystemDashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  useEffect(() => {
+    setColumnsCookie("system-delegate-columns", delegateColumns)
+  }, [delegateColumns])
+
+  useEffect(() => {
+    setColumnsCookie("system-partnership-columns", partnershipColumns)
+  }, [partnershipColumns])
+
+  useEffect(() => {
+    setColumnsCookie("system-volunteer-columns", volunteerColumns)
+  }, [volunteerColumns])
+
   const handleSignOut = async () => {
     await supabase.auth.signOut()
     setAuthorized(false)
+    sessionStorage.removeItem("systemDashboardAuthorized")
     setUserEmail(null)
     navigate("/system/login", { replace: true })
   }
@@ -336,7 +407,7 @@ const SystemDashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="w-full px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div>
               <h1 className="text-xl font-semibold text-foreground">System Console</h1>
@@ -362,7 +433,7 @@ const SystemDashboard = () => {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-6 py-10 space-y-10">
+      <main className="w-full px-6 py-10 space-y-10">
         <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[
             { label: "Delegates", value: totals.delegates, icon: Users },
@@ -388,37 +459,35 @@ const SystemDashboard = () => {
         </section>
 
         <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
-                <Database size={20} className="text-accent" />
-                Delegate Registrations
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                All registration records with editable country allocation and status.
-              </p>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
+              <Database size={20} className="text-accent" />
+              Delegate Registrations
+            </h2>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-muted-foreground">Scroll →</span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 text-sm px-3 py-2 rounded-md border border-border hover:bg-secondary transition-colors">
+                    Columns
+                    <ChevronDown size={16} />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {delegateColumnOptions.map((column) => (
+                    <DropdownMenuCheckboxItem
+                      key={column.key}
+                      checked={delegateColumns[column.key]}
+                      onCheckedChange={(checked) =>
+                        setDelegateColumns((prev) => ({ ...prev, [column.key]: Boolean(checked) }))
+                      }
+                    >
+                      {column.label}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 text-sm px-3 py-2 rounded-md border border-border hover:bg-secondary transition-colors">
-                  Columns
-                  <ChevronDown size={16} />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                {delegateColumnOptions.map((column) => (
-                  <DropdownMenuCheckboxItem
-                    key={column.key}
-                    checked={delegateColumns[column.key]}
-                    onCheckedChange={(checked) =>
-                      setDelegateColumns((prev) => ({ ...prev, [column.key]: Boolean(checked) }))
-                    }
-                  >
-                    {column.label}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
 
           <div
@@ -633,38 +702,38 @@ const SystemDashboard = () => {
         </section>
 
         <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                <Building2 className="text-accent" size={20} />
-                Partnership Applications
-              </h3>
-              <p className="text-sm text-muted-foreground">New and recent partnership inquiries.</p>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+              <Building2 className="text-accent" size={20} />
+              Partnership Applications
+            </h3>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-muted-foreground">Scroll →</span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 text-sm px-3 py-2 rounded-md border border-border hover:bg-secondary transition-colors">
+                    Columns
+                    <ChevronDown size={16} />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {partnershipColumnOptions.map((column) => (
+                    <DropdownMenuCheckboxItem
+                      key={column.key}
+                      checked={partnershipColumns[column.key]}
+                      onCheckedChange={(checked) =>
+                        setPartnershipColumns((prev) => ({
+                          ...prev,
+                          [column.key]: Boolean(checked),
+                        }))
+                      }
+                    >
+                      {column.label}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 text-sm px-3 py-2 rounded-md border border-border hover:bg-secondary transition-colors">
-                  Columns
-                  <ChevronDown size={16} />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                {partnershipColumnOptions.map((column) => (
-                  <DropdownMenuCheckboxItem
-                    key={column.key}
-                    checked={partnershipColumns[column.key]}
-                    onCheckedChange={(checked) =>
-                      setPartnershipColumns((prev) => ({
-                        ...prev,
-                        [column.key]: Boolean(checked),
-                      }))
-                    }
-                  >
-                    {column.label}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
 
           <div
@@ -754,38 +823,38 @@ const SystemDashboard = () => {
         </section>
 
         <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                <UserCheck className="text-accent" size={20} />
-                Volunteer Signups
-              </h3>
-              <p className="text-sm text-muted-foreground">Latest volunteer applications.</p>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+              <UserCheck className="text-accent" size={20} />
+              Volunteer Signups
+            </h3>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-muted-foreground">Scroll →</span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 text-sm px-3 py-2 rounded-md border border-border hover:bg-secondary transition-colors">
+                    Columns
+                    <ChevronDown size={16} />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {volunteerColumnOptions.map((column) => (
+                    <DropdownMenuCheckboxItem
+                      key={column.key}
+                      checked={volunteerColumns[column.key]}
+                      onCheckedChange={(checked) =>
+                        setVolunteerColumns((prev) => ({
+                          ...prev,
+                          [column.key]: Boolean(checked),
+                        }))
+                      }
+                    >
+                      {column.label}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 text-sm px-3 py-2 rounded-md border border-border hover:bg-secondary transition-colors">
-                  Columns
-                  <ChevronDown size={16} />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                {volunteerColumnOptions.map((column) => (
-                  <DropdownMenuCheckboxItem
-                    key={column.key}
-                    checked={volunteerColumns[column.key]}
-                    onCheckedChange={(checked) =>
-                      setVolunteerColumns((prev) => ({
-                        ...prev,
-                        [column.key]: Boolean(checked),
-                      }))
-                    }
-                  >
-                    {column.label}
-                  </DropdownMenuCheckboxItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
 
           <div

@@ -3,18 +3,26 @@ import { motion } from "framer-motion"
 import { useNavigate } from "react-router-dom"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
+import { allCountries } from "@/data/countries"
+import { committees } from "@/data/committees"
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   Database,
   Flag,
   LogOut,
   RefreshCcw,
   Users,
-  ClipboardList,
   Building2,
   UserCheck,
   Pencil,
   Check,
   X,
+  ChevronDown,
 } from "lucide-react"
 
 interface DelegateRegistration {
@@ -34,17 +42,6 @@ interface DelegateRegistration {
   notes: string | null
   created_at: string
   updated_at: string
-}
-
-interface PolicyProposal {
-  id: string
-  title: string
-  description: string | null
-  status: string
-  submitted_at: string | null
-  created_at: string
-  registration_id: string | null
-  user_id: string
 }
 
 interface PartnershipApplication {
@@ -76,44 +73,127 @@ const SystemDashboard = () => {
   const [userEmail, setUserEmail] = useState<string | null>(null)
 
   const [delegates, setDelegates] = useState<DelegateRegistration[]>([])
-  const [proposals, setProposals] = useState<PolicyProposal[]>([])
   const [partnerships, setPartnerships] = useState<PartnershipApplication[]>([])
   const [volunteers, setVolunteers] = useState<VolunteerSignup[]>([])
 
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState({
     assigned_country: "",
+    assigned_committee: "",
     status: "pending",
   })
+
+  const [delegateColumns, setDelegateColumns] = useState({
+    delegate: true,
+    delegation: true,
+    preferences: true,
+    assignments: true,
+    status: true,
+    payment: true,
+    notes: true,
+    created: true,
+    actions: true,
+  })
+
+  const [partnershipColumns, setPartnershipColumns] = useState({
+    organization: true,
+    contact: true,
+    email: true,
+    type: true,
+    status: true,
+    message: true,
+    created: true,
+  })
+
+  const [volunteerColumns, setVolunteerColumns] = useState({
+    name: true,
+    email: true,
+    role: true,
+    school: true,
+    status: true,
+    experience: true,
+    created: true,
+  })
+
+  const delegateColumnOptions = [
+    { key: "delegate", label: "Delegate" },
+    { key: "delegation", label: "Delegation" },
+    { key: "preferences", label: "Preferences" },
+    { key: "assignments", label: "Assignments" },
+    { key: "status", label: "Status" },
+    { key: "payment", label: "Payment" },
+    { key: "notes", label: "Notes" },
+    { key: "created", label: "Created" },
+    { key: "actions", label: "Actions" },
+  ] as const
+
+  const partnershipColumnOptions = [
+    { key: "organization", label: "Organization" },
+    { key: "contact", label: "Contact" },
+    { key: "email", label: "Email" },
+    { key: "type", label: "Type" },
+    { key: "status", label: "Status" },
+    { key: "message", label: "Message" },
+    { key: "created", label: "Created" },
+  ] as const
+
+  const volunteerColumnOptions = [
+    { key: "name", label: "Name" },
+    { key: "email", label: "Email" },
+    { key: "role", label: "Role" },
+    { key: "school", label: "School" },
+    { key: "status", label: "Status" },
+    { key: "experience", label: "Experience" },
+    { key: "created", label: "Created" },
+  ] as const
+
+  const delegateColumnCount = useMemo(
+    () => Object.values(delegateColumns).filter(Boolean).length,
+    [delegateColumns]
+  )
+  const partnershipColumnCount = useMemo(
+    () => Object.values(partnershipColumns).filter(Boolean).length,
+    [partnershipColumns]
+  )
+  const volunteerColumnCount = useMemo(
+    () => Object.values(volunteerColumns).filter(Boolean).length,
+    [volunteerColumns]
+  )
 
   const totals = useMemo(() => {
     return {
       delegates: delegates.length,
-      proposals: proposals.length,
       partnerships: partnerships.length,
       volunteers: volunteers.length,
     }
-  }, [delegates, proposals, partnerships, volunteers])
+  }, [delegates, partnerships, volunteers])
 
   const fetchAllData = async () => {
     setLoading(true)
 
-    const [delegatesRes, proposalsRes, partnershipRes, volunteerRes] = await Promise.all([
+    const [delegatesRes, partnershipRes, volunteerRes] = await Promise.all([
       supabase.from("delegate_registrations").select("*").order("created_at", { ascending: false }),
-      supabase.from("policy_proposals").select("*").order("created_at", { ascending: false }),
       supabase.from("partnership_applications").select("*").order("created_at", { ascending: false }),
       supabase.from("volunteer_signups").select("*").order("created_at", { ascending: false }),
     ])
 
     if (delegatesRes.error) toast.error("Failed to load delegate registrations")
-    if (proposalsRes.error) toast.error("Failed to load policy proposals")
     if (partnershipRes.error) toast.error("Failed to load partnerships")
     if (volunteerRes.error) toast.error("Failed to load volunteer signups")
 
     setDelegates((delegatesRes.data ?? []) as DelegateRegistration[])
-    setProposals((proposalsRes.data ?? []) as PolicyProposal[])
     setPartnerships((partnershipRes.data ?? []) as PartnershipApplication[])
     setVolunteers((volunteerRes.data ?? []) as VolunteerSignup[])
+
+    sessionStorage.setItem(
+      "systemDashboardData",
+      JSON.stringify({
+        delegates: delegatesRes.data ?? [],
+        partnerships: partnershipRes.data ?? [],
+        volunteers: volunteerRes.data ?? [],
+        cachedAt: new Date().toISOString(),
+      })
+    )
 
     setLoading(false)
   }
@@ -122,6 +202,7 @@ const SystemDashboard = () => {
     setEditingId(delegate.id)
     setEditForm({
       assigned_country: delegate.assigned_country ?? "",
+      assigned_committee: delegate.assigned_committee ?? "",
       status: delegate.status ?? "pending",
     })
   }
@@ -131,6 +212,7 @@ const SystemDashboard = () => {
       .from("delegate_registrations")
       .update({
         assigned_country: editForm.assigned_country || null,
+        assigned_committee: editForm.assigned_committee || null,
         status: editForm.status,
       })
       .eq("id", id)
@@ -184,7 +266,20 @@ const SystemDashboard = () => {
     }
 
     setAuthorized(true)
-    await fetchAllData()
+    const cached = sessionStorage.getItem("systemDashboardData")
+    if (cached) {
+      const parsed = JSON.parse(cached) as {
+        delegates: DelegateRegistration[]
+        partnerships: PartnershipApplication[]
+        volunteers: VolunteerSignup[]
+      }
+      setDelegates(parsed.delegates ?? [])
+      setPartnerships(parsed.partnerships ?? [])
+      setVolunteers(parsed.volunteers ?? [])
+      setLoading(false)
+    } else {
+      await fetchAllData()
+    }
   }
 
   useEffect(() => {
@@ -268,10 +363,9 @@ const SystemDashboard = () => {
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-10 space-y-10">
-        <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[
             { label: "Delegates", value: totals.delegates, icon: Users },
-            { label: "Policy Proposals", value: totals.proposals, icon: ClipboardList },
             { label: "Partnerships", value: totals.partnerships, icon: Building2 },
             { label: "Volunteers", value: totals.volunteers, icon: UserCheck },
           ].map((card) => (
@@ -304,6 +398,27 @@ const SystemDashboard = () => {
                 All registration records with editable country allocation and status.
               </p>
             </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 text-sm px-3 py-2 rounded-md border border-border hover:bg-secondary transition-colors">
+                  Columns
+                  <ChevronDown size={16} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                {delegateColumnOptions.map((column) => (
+                  <DropdownMenuCheckboxItem
+                    key={column.key}
+                    checked={delegateColumns[column.key]}
+                    onCheckedChange={(checked) =>
+                      setDelegateColumns((prev) => ({ ...prev, [column.key]: Boolean(checked) }))
+                    }
+                  >
+                    {column.label}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           <div
@@ -311,129 +426,324 @@ const SystemDashboard = () => {
             style={{ boxShadow: "var(--shadow-card)" }}
           >
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-sm min-w-max">
                 <thead className="bg-secondary">
                   <tr className="text-left">
-                    <th className="px-4 py-3 font-medium text-foreground">Delegate</th>
-                    <th className="px-4 py-3 font-medium text-foreground">Delegation</th>
-                    <th className="px-4 py-3 font-medium text-foreground">Preferences</th>
-                    <th className="px-4 py-3 font-medium text-foreground">Assignments</th>
-                    <th className="px-4 py-3 font-medium text-foreground">Status</th>
-                    <th className="px-4 py-3 font-medium text-foreground">Payment</th>
-                    <th className="px-4 py-3 font-medium text-foreground">Notes</th>
-                    <th className="px-4 py-3 font-medium text-foreground">Created</th>
-                    <th className="px-4 py-3 font-medium text-foreground">Actions</th>
+                    {delegateColumns.delegate && (
+                      <th className="px-4 py-3 font-medium text-foreground">Delegate</th>
+                    )}
+                    {delegateColumns.delegation && (
+                      <th className="px-4 py-3 font-medium text-foreground">Delegation</th>
+                    )}
+                    {delegateColumns.preferences && (
+                      <th className="px-4 py-3 font-medium text-foreground">Preferences</th>
+                    )}
+                    {delegateColumns.assignments && (
+                      <th className="px-4 py-3 font-medium text-foreground">Assignments</th>
+                    )}
+                    {delegateColumns.status && (
+                      <th className="px-4 py-3 font-medium text-foreground">Status</th>
+                    )}
+                    {delegateColumns.payment && (
+                      <th className="px-4 py-3 font-medium text-foreground">Payment</th>
+                    )}
+                    {delegateColumns.notes && (
+                      <th className="px-4 py-3 font-medium text-foreground">Notes</th>
+                    )}
+                    {delegateColumns.created && (
+                      <th className="px-4 py-3 font-medium text-foreground">Created</th>
+                    )}
+                    {delegateColumns.actions && (
+                      <th className="px-4 py-3 font-medium text-foreground">Actions</th>
+                    )}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {delegates.length === 0 ? (
                     <tr>
-                      <td colSpan={9} className="px-4 py-6 text-center text-sm text-muted-foreground">
+                      <td
+                        colSpan={delegateColumnCount}
+                        className="px-4 py-6 text-center text-sm text-muted-foreground"
+                      >
                         No delegate registrations found.
                       </td>
                     </tr>
                   ) : (
                     delegates.map((delegate) => (
                       <tr key={delegate.id} className="hover:bg-secondary/50">
-                        <td className="px-4 py-3">
-                          <p className="font-medium text-foreground">
-                            {delegate.first_name} {delegate.last_name}
-                          </p>
-                          <p className="text-xs text-muted-foreground">{delegate.email}</p>
-                        </td>
-                        <td className="px-4 py-3">
-                          <p className="capitalize text-foreground">{delegate.delegation_type}</p>
-                        </td>
-                        <td className="px-4 py-3">
-                          <p className="text-foreground">
-                            {delegate.delegation_type === "country"
-                              ? delegate.preferred_country
-                              : delegate.preferred_institution}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            Committee: {delegate.committee_preference || "Any"}
-                          </p>
-                        </td>
-                        <td className="px-4 py-3">
-                          {editingId === delegate.id ? (
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2">
-                                <Flag size={16} className="text-accent" />
-                                <input
-                                  type="text"
-                                  value={editForm.assigned_country}
-                                  onChange={(event) =>
-                                    setEditForm({ ...editForm, assigned_country: event.target.value })
-                                  }
-                                  className="form-input text-sm"
-                                  placeholder="Assigned country"
-                                />
+                        {delegateColumns.delegate && (
+                          <td className="px-4 py-3">
+                            <p className="font-medium text-foreground">
+                              {delegate.first_name} {delegate.last_name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">{delegate.email}</p>
+                          </td>
+                        )}
+                        {delegateColumns.delegation && (
+                          <td className="px-4 py-3">
+                            <p className="capitalize text-foreground">{delegate.delegation_type}</p>
+                          </td>
+                        )}
+                        {delegateColumns.preferences && (
+                          <td className="px-4 py-3">
+                            <p className="text-foreground">
+                              {delegate.delegation_type === "country"
+                                ? delegate.preferred_country
+                                : delegate.preferred_institution}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Committee: {delegate.committee_preference || "Any"}
+                            </p>
+                          </td>
+                        )}
+                        {delegateColumns.assignments && (
+                          <td className="px-4 py-3">
+                            {editingId === delegate.id ? (
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <Flag size={16} className="text-accent" />
+                                  <input
+                                    type="text"
+                                    list="country-options"
+                                    value={editForm.assigned_country}
+                                    onChange={(event) =>
+                                      setEditForm({
+                                        ...editForm,
+                                        assigned_country: event.target.value,
+                                      })
+                                    }
+                                    className="form-input text-sm"
+                                    placeholder="Assigned country"
+                                  />
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Flag size={16} className="text-accent" />
+                                  <input
+                                    type="text"
+                                    list="committee-options"
+                                    value={editForm.assigned_committee}
+                                    onChange={(event) =>
+                                      setEditForm({
+                                        ...editForm,
+                                        assigned_committee: event.target.value,
+                                      })
+                                    }
+                                    className="form-input text-sm"
+                                    placeholder="Assigned committee"
+                                  />
+                                </div>
                               </div>
-                            </div>
-                          ) : (
-                            <div>
-                              <p className="text-foreground">
-                                Country: {delegate.assigned_country || "Unassigned"}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                Committee: {delegate.assigned_committee || "Unassigned"}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                Institution: {delegate.assigned_institution || "N/A"}
-                              </p>
-                            </div>
-                          )}
-                        </td>
-                        <td className="px-4 py-3">
-                          {editingId === delegate.id ? (
-                            <select
-                              className="form-input text-sm"
-                              value={editForm.status}
-                              onChange={(event) =>
-                                setEditForm({ ...editForm, status: event.target.value })
-                              }
-                            >
-                              <option value="pending">Pending</option>
-                              <option value="approved">Approved</option>
-                              <option value="rejected">Rejected</option>
-                              <option value="waitlist">Waitlist</option>
-                            </select>
-                          ) : (
-                            <span className="text-foreground capitalize">{delegate.status}</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 capitalize text-foreground">
-                          {delegate.payment_status || "n/a"}
-                        </td>
-                        <td className="px-4 py-3 text-muted-foreground">{delegate.notes || "-"}</td>
-                        <td className="px-4 py-3 text-muted-foreground">
-                          {new Date(delegate.created_at).toLocaleDateString()}
-                        </td>
-                        <td className="px-4 py-3">
-                          {editingId === delegate.id ? (
-                            <div className="flex items-center gap-2">
+                            ) : (
+                              <div>
+                                <p className="text-foreground">
+                                  Country: {delegate.assigned_country || "Unassigned"}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  Committee: {delegate.assigned_committee || "Unassigned"}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  Institution: {delegate.assigned_institution || "N/A"}
+                                </p>
+                              </div>
+                            )}
+                          </td>
+                        )}
+                        {delegateColumns.status && (
+                          <td className="px-4 py-3">
+                            {editingId === delegate.id ? (
+                              <select
+                                className="form-input text-sm"
+                                value={editForm.status}
+                                onChange={(event) =>
+                                  setEditForm({ ...editForm, status: event.target.value })
+                                }
+                              >
+                                <option value="pending">Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="rejected">Rejected</option>
+                                <option value="waitlist">Waitlist</option>
+                              </select>
+                            ) : (
+                              <span className="text-foreground capitalize">{delegate.status}</span>
+                            )}
+                          </td>
+                        )}
+                        {delegateColumns.payment && (
+                          <td className="px-4 py-3 capitalize text-foreground">
+                            {delegate.payment_status || "n/a"}
+                          </td>
+                        )}
+                        {delegateColumns.notes && (
+                          <td className="px-4 py-3 text-muted-foreground">
+                            {delegate.notes || "-"}
+                          </td>
+                        )}
+                        {delegateColumns.created && (
+                          <td className="px-4 py-3 text-muted-foreground">
+                            {new Date(delegate.created_at).toLocaleDateString()}
+                          </td>
+                        )}
+                        {delegateColumns.actions && (
+                          <td className="px-4 py-3">
+                            {editingId === delegate.id ? (
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => handleSave(delegate.id)}
+                                  className="p-1 rounded-md text-accent hover:bg-accent/10"
+                                >
+                                  <Check size={18} />
+                                </button>
+                                <button
+                                  onClick={() => setEditingId(null)}
+                                  className="p-1 rounded-md text-destructive hover:bg-destructive/10"
+                                >
+                                  <X size={18} />
+                                </button>
+                              </div>
+                            ) : (
                               <button
-                                onClick={() => handleSave(delegate.id)}
+                                onClick={() => handleEdit(delegate)}
                                 className="p-1 rounded-md text-accent hover:bg-accent/10"
                               >
-                                <Check size={18} />
+                                <Pencil size={18} />
                               </button>
-                              <button
-                                onClick={() => setEditingId(null)}
-                                className="p-1 rounded-md text-destructive hover:bg-destructive/10"
-                              >
-                                <X size={18} />
-                              </button>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => handleEdit(delegate)}
-                              className="p-1 rounded-md text-accent hover:bg-accent/10"
-                            >
-                              <Pencil size={18} />
-                            </button>
-                          )}
-                        </td>
+                            )}
+                          </td>
+                        )}
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <datalist id="country-options">
+              {allCountries.map((country) => (
+                <option key={country} value={country} />
+              ))}
+            </datalist>
+            <datalist id="committee-options">
+              {committees.map((committee) => (
+                <option
+                  key={committee.id}
+                  value={committee.abbreviation}
+                >{`${committee.name} (${committee.abbreviation})`}</option>
+              ))}
+            </datalist>
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <Building2 className="text-accent" size={20} />
+                Partnership Applications
+              </h3>
+              <p className="text-sm text-muted-foreground">New and recent partnership inquiries.</p>
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 text-sm px-3 py-2 rounded-md border border-border hover:bg-secondary transition-colors">
+                  Columns
+                  <ChevronDown size={16} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                {partnershipColumnOptions.map((column) => (
+                  <DropdownMenuCheckboxItem
+                    key={column.key}
+                    checked={partnershipColumns[column.key]}
+                    onCheckedChange={(checked) =>
+                      setPartnershipColumns((prev) => ({
+                        ...prev,
+                        [column.key]: Boolean(checked),
+                      }))
+                    }
+                  >
+                    {column.label}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <div
+            className="bg-card border border-border rounded-xl overflow-hidden"
+            style={{ boxShadow: "var(--shadow-card)" }}
+          >
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm min-w-max">
+                <thead className="bg-secondary">
+                  <tr className="text-left">
+                    {partnershipColumns.organization && (
+                      <th className="px-4 py-3 font-medium text-foreground">Organization</th>
+                    )}
+                    {partnershipColumns.contact && (
+                      <th className="px-4 py-3 font-medium text-foreground">Contact</th>
+                    )}
+                    {partnershipColumns.email && (
+                      <th className="px-4 py-3 font-medium text-foreground">Email</th>
+                    )}
+                    {partnershipColumns.type && (
+                      <th className="px-4 py-3 font-medium text-foreground">Type</th>
+                    )}
+                    {partnershipColumns.status && (
+                      <th className="px-4 py-3 font-medium text-foreground">Status</th>
+                    )}
+                    {partnershipColumns.message && (
+                      <th className="px-4 py-3 font-medium text-foreground">Message</th>
+                    )}
+                    {partnershipColumns.created && (
+                      <th className="px-4 py-3 font-medium text-foreground">Created</th>
+                    )}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {partnerships.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={partnershipColumnCount}
+                        className="px-4 py-6 text-center text-sm text-muted-foreground"
+                      >
+                        No partnership applications yet.
+                      </td>
+                    </tr>
+                  ) : (
+                    partnerships.map((partner) => (
+                      <tr key={partner.id} className="hover:bg-secondary/50">
+                        {partnershipColumns.organization && (
+                          <td className="px-4 py-3 text-foreground">
+                            {partner.organization_name}
+                          </td>
+                        )}
+                        {partnershipColumns.contact && (
+                          <td className="px-4 py-3 text-foreground">
+                            {partner.contact_person}
+                          </td>
+                        )}
+                        {partnershipColumns.email && (
+                          <td className="px-4 py-3 text-muted-foreground">{partner.email}</td>
+                        )}
+                        {partnershipColumns.type && (
+                          <td className="px-4 py-3 text-foreground capitalize">
+                            {partner.partnership_type}
+                          </td>
+                        )}
+                        {partnershipColumns.status && (
+                          <td className="px-4 py-3 text-foreground capitalize">
+                            {partner.status}
+                          </td>
+                        )}
+                        {partnershipColumns.message && (
+                          <td className="px-4 py-3 text-muted-foreground">
+                            {partner.message || "-"}
+                          </td>
+                        )}
+                        {partnershipColumns.created && (
+                          <td className="px-4 py-3 text-muted-foreground">
+                            {new Date(partner.created_at).toLocaleDateString()}
+                          </td>
+                        )}
                       </tr>
                     ))
                   )}
@@ -443,87 +753,120 @@ const SystemDashboard = () => {
           </div>
         </section>
 
-        <section className="grid gap-6 lg:grid-cols-2">
-          <div
-            className="bg-card border border-border rounded-xl p-6"
-            style={{ boxShadow: "var(--shadow-card)" }}
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <ClipboardList className="text-accent" size={20} />
-              <h3 className="text-lg font-semibold text-foreground">Policy Proposals</h3>
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <UserCheck className="text-accent" size={20} />
+                Volunteer Signups
+              </h3>
+              <p className="text-sm text-muted-foreground">Latest volunteer applications.</p>
             </div>
-            <div className="space-y-4">
-              {proposals.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No policy proposals submitted yet.</p>
-              ) : (
-                proposals.slice(0, 6).map((proposal) => (
-                  <div key={proposal.id} className="border border-border rounded-lg p-4">
-                    <p className="font-medium text-foreground">{proposal.title}</p>
-                    <p className="text-xs text-muted-foreground">Status: {proposal.status}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Submitted:{" "}
-                      {proposal.submitted_at
-                        ? new Date(proposal.submitted_at).toLocaleDateString()
-                        : "Draft"}
-                    </p>
-                  </div>
-                ))
-              )}
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 text-sm px-3 py-2 rounded-md border border-border hover:bg-secondary transition-colors">
+                  Columns
+                  <ChevronDown size={16} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                {volunteerColumnOptions.map((column) => (
+                  <DropdownMenuCheckboxItem
+                    key={column.key}
+                    checked={volunteerColumns[column.key]}
+                    onCheckedChange={(checked) =>
+                      setVolunteerColumns((prev) => ({
+                        ...prev,
+                        [column.key]: Boolean(checked),
+                      }))
+                    }
+                  >
+                    {column.label}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           <div
-            className="bg-card border border-border rounded-xl p-6"
+            className="bg-card border border-border rounded-xl overflow-hidden"
             style={{ boxShadow: "var(--shadow-card)" }}
           >
-            <div className="flex items-center gap-2 mb-4">
-              <Building2 className="text-accent" size={20} />
-              <h3 className="text-lg font-semibold text-foreground">Partnership Applications</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm min-w-max">
+                <thead className="bg-secondary">
+                  <tr className="text-left">
+                    {volunteerColumns.name && (
+                      <th className="px-4 py-3 font-medium text-foreground">Name</th>
+                    )}
+                    {volunteerColumns.email && (
+                      <th className="px-4 py-3 font-medium text-foreground">Email</th>
+                    )}
+                    {volunteerColumns.role && (
+                      <th className="px-4 py-3 font-medium text-foreground">Role</th>
+                    )}
+                    {volunteerColumns.school && (
+                      <th className="px-4 py-3 font-medium text-foreground">School</th>
+                    )}
+                    {volunteerColumns.status && (
+                      <th className="px-4 py-3 font-medium text-foreground">Status</th>
+                    )}
+                    {volunteerColumns.experience && (
+                      <th className="px-4 py-3 font-medium text-foreground">Experience</th>
+                    )}
+                    {volunteerColumns.created && (
+                      <th className="px-4 py-3 font-medium text-foreground">Created</th>
+                    )}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {volunteers.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={volunteerColumnCount}
+                        className="px-4 py-6 text-center text-sm text-muted-foreground"
+                      >
+                        No volunteer signups yet.
+                      </td>
+                    </tr>
+                  ) : (
+                    volunteers.map((volunteer) => (
+                      <tr key={volunteer.id} className="hover:bg-secondary/50">
+                        {volunteerColumns.name && (
+                          <td className="px-4 py-3 text-foreground">{volunteer.full_name}</td>
+                        )}
+                        {volunteerColumns.email && (
+                          <td className="px-4 py-3 text-muted-foreground">{volunteer.email}</td>
+                        )}
+                        {volunteerColumns.role && (
+                          <td className="px-4 py-3 text-foreground">
+                            {volunteer.preferred_role}
+                          </td>
+                        )}
+                        {volunteerColumns.school && (
+                          <td className="px-4 py-3 text-foreground">{volunteer.school}</td>
+                        )}
+                        {volunteerColumns.status && (
+                          <td className="px-4 py-3 text-foreground capitalize">
+                            {volunteer.status}
+                          </td>
+                        )}
+                        {volunteerColumns.experience && (
+                          <td className="px-4 py-3 text-muted-foreground">
+                            {volunteer.experience || "-"}
+                          </td>
+                        )}
+                        {volunteerColumns.created && (
+                          <td className="px-4 py-3 text-muted-foreground">
+                            {new Date(volunteer.created_at).toLocaleDateString()}
+                          </td>
+                        )}
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
             </div>
-            <div className="space-y-4">
-              {partnerships.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  No partnership applications yet.
-                </p>
-              ) : (
-                partnerships.slice(0, 6).map((partner) => (
-                  <div key={partner.id} className="border border-border rounded-lg p-4">
-                    <p className="font-medium text-foreground">{partner.organization_name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      Contact: {partner.contact_person}
-                    </p>
-                    <p className="text-xs text-muted-foreground">Status: {partner.status}</p>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </section>
-
-        <section
-          className="bg-card border border-border rounded-xl p-6"
-          style={{ boxShadow: "var(--shadow-card)" }}
-        >
-          <div className="flex items-center gap-2 mb-4">
-            <UserCheck className="text-accent" size={20} />
-            <h3 className="text-lg font-semibold text-foreground">Volunteer Signups</h3>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            {volunteers.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No volunteer signups yet.</p>
-            ) : (
-              volunteers.slice(0, 6).map((volunteer) => (
-                <div key={volunteer.id} className="border border-border rounded-lg p-4">
-                  <p className="font-medium text-foreground">{volunteer.full_name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    Role: {volunteer.preferred_role}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Status: {volunteer.status}
-                  </p>
-                </div>
-              ))
-            )}
           </div>
         </section>
       </main>

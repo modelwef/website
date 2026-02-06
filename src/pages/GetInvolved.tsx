@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Layout } from '@/components/layout/Layout';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { SectionHeader } from '@/components/ui/SectionHeader';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Building2, User, CheckCircle } from 'lucide-react';
 
@@ -14,6 +15,7 @@ const GetInvolved = () => {
     partnershipType: '',
     message: '',
   });
+  const [submittingPartnership, setSubmittingPartnership] = useState(false);
 
   const [volunteerForm, setVolunteerForm] = useState({
     name: '',
@@ -22,17 +24,58 @@ const GetInvolved = () => {
     experience: '',
     role: '',
   });
+  const [submittingVolunteer, setSubmittingVolunteer] = useState(false);
 
-  const handlePartnershipSubmit = (e: React.FormEvent) => {
+  const handlePartnershipSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmittingPartnership(true);
+
+    const { error } = await supabase
+      .from('partnership_applications')
+      .insert({
+        organization_name: partnershipForm.organization,
+        contact_person: partnershipForm.contact,
+        email: partnershipForm.email,
+        partnership_type: partnershipForm.partnershipType,
+        message: partnershipForm.message || null,
+        status: 'pending',
+      });
+
+    if (error) {
+      toast.error('Failed to submit partnership inquiry. Please try again.');
+      setSubmittingPartnership(false);
+      return;
+    }
+
     toast.success('Partnership inquiry submitted! We will contact you soon.');
     setPartnershipForm({ organization: '', contact: '', email: '', partnershipType: '', message: '' });
+    setSubmittingPartnership(false);
   };
 
-  const handleVolunteerSubmit = (e: React.FormEvent) => {
+  const handleVolunteerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmittingVolunteer(true);
+
+    const { error } = await supabase
+      .from('volunteer_signups')
+      .insert({
+        full_name: volunteerForm.name,
+        school: volunteerForm.school,
+        email: volunteerForm.email,
+        experience: volunteerForm.experience || null,
+        preferred_role: volunteerForm.role,
+        status: 'pending',
+      });
+
+    if (error) {
+      toast.error('Failed to submit volunteer application. Please try again.');
+      setSubmittingVolunteer(false);
+      return;
+    }
+
     toast.success('Volunteer application submitted! We will review your application.');
     setVolunteerForm({ name: '', school: '', email: '', experience: '', role: '' });
+    setSubmittingVolunteer(false);
   };
 
   return (
@@ -145,8 +188,12 @@ const GetInvolved = () => {
                       onChange={(e) => setPartnershipForm({ ...partnershipForm, message: e.target.value })}
                     />
                   </div>
-                  <button type="submit" className="w-full btn-primary">
-                    Submit Inquiry
+                  <button
+                    type="submit"
+                    className="w-full btn-primary"
+                    disabled={submittingPartnership}
+                  >
+                    {submittingPartnership ? 'Submitting...' : 'Submit Inquiry'}
                   </button>
                 </div>
               </form>
@@ -265,8 +312,12 @@ const GetInvolved = () => {
                       <option value="coordinator">Event Coordinator</option>
                     </select>
                   </div>
-                  <button type="submit" className="w-full btn-primary">
-                    Submit Application
+                  <button
+                    type="submit"
+                    className="w-full btn-primary"
+                    disabled={submittingVolunteer}
+                  >
+                    {submittingVolunteer ? 'Submitting...' : 'Submit Application'}
                   </button>
                 </div>
               </form>

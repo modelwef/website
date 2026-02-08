@@ -316,6 +316,12 @@ export type Database = {
         }
         Returns: boolean
       }
+      request_delegate_password_reset: {
+        Args: {
+          _email: string
+        }
+        Returns: string | null
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

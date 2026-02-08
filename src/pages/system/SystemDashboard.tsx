@@ -123,6 +123,7 @@ const SystemDashboard = () => {
     assigned_country: "",
     assigned_committee: "",
     status: "pending",
+    payment_status: "",
   })
 
   const defaultDelegateColumns = {
@@ -261,6 +262,7 @@ const SystemDashboard = () => {
       assigned_country: delegate.assigned_country ?? "",
       assigned_committee: delegate.assigned_committee ?? "",
       status: delegate.status ?? "pending",
+      payment_status: delegate.payment_status ?? "",
     })
   }
 
@@ -271,6 +273,7 @@ const SystemDashboard = () => {
         assigned_country: editForm.assigned_country || null,
         assigned_committee: editForm.assigned_committee || null,
         status: editForm.status,
+        payment_status: editForm.payment_status || null,
       })
       .eq("id", id)
 
@@ -639,7 +642,24 @@ const SystemDashboard = () => {
                         )}
                         {delegateColumns.payment && (
                           <td className="px-4 py-3 capitalize text-foreground">
-                            {delegate.payment_status || "n/a"}
+                            {editingId === delegate.id ? (
+                              <select
+                                className="form-input text-sm capitalize"
+                                value={editForm.payment_status}
+                                onChange={(event) =>
+                                  setEditForm({
+                                    ...editForm,
+                                    payment_status: event.target.value,
+                                  })
+                                }
+                              >
+                                <option value="">Select payment</option>
+                                <option value="paid">Paid</option>
+                                <option value="unpaid">Unpaid</option>
+                              </select>
+                            ) : (
+                              delegate.payment_status || "n/a"
+                            )}
                           </td>
                         )}
                         {delegateColumns.notes && (

@@ -136,6 +136,12 @@ const Register = () => {
       lastName: rest.join(' '),
     };
   };
+  const formatRegistrationError = (error: { code?: string; message?: string; details?: string }) => {
+    if (error.code === '23505') {
+      return 'This email is already registered. Please use a different email or log in.';
+    }
+    return error.details || error.message || 'Registration failed. Please try again or contact support.';
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -176,13 +182,15 @@ const Register = () => {
 
     if (regError) {
       console.error('Registration error:', regError);
-      toast.error('Registration failed. Please try again or contact support.');
+      toast.error(formatRegistrationError(regError));
+      setLoading(false);
+      return;
     } else {
-      toast.success('Registration submitted successfully! We will email you with next steps.');
+      toast.success('Registration submitted successfully! You can login now.');
+      navigate('/login');
     }
 
     setLoading(false);
-    navigate('/login');
   };
 
   return (

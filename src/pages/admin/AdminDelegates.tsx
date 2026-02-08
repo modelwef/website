@@ -162,6 +162,7 @@ const AdminDelegates = () => {
                   <th className="text-left px-4 py-3 text-sm font-medium text-foreground">Preference</th>
                   <th className="text-left px-4 py-3 text-sm font-medium text-foreground">Assignment</th>
                   <th className="text-left px-4 py-3 text-sm font-medium text-foreground">Status</th>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-foreground">Payment</th>
                   <th className="text-left px-4 py-3 text-sm font-medium text-foreground">Actions</th>
                 </tr>
               </thead>
@@ -211,6 +212,17 @@ const AdminDelegates = () => {
                         </select>
                       ) : (
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(delegate.status)}`}>{delegate.status}</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-4">
+                      {editingId === delegate.id ? (
+                        <select className="form-input text-sm py-1 capitalize" value={editForm.payment_status} onChange={(e) => setEditForm({ ...editForm, payment_status: e.target.value })}>
+                          <option value="">Select payment</option>
+                          <option value="paid">Paid</option>
+                          <option value="unpaid">Unpaid</option>
+                        </select>
+                      ) : (
+                        <span className="text-sm text-foreground capitalize">{delegate.payment_status || 'Pending'}</span>
                       )}
                     </td>
                     <td className="px-4 py-4">

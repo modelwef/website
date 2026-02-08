@@ -19,7 +19,15 @@ const countryCodeToFlagEmoji = (code: string) =>
 
 const getRegionCodes = () => {
   const intl = Intl as typeof Intl & { supportedValuesOf?: (key: string) => string[] };
-  return intl.supportedValuesOf ? intl.supportedValuesOf('region') : [];
+  if (!intl.supportedValuesOf) {
+    return [];
+  }
+  try {
+    return intl.supportedValuesOf('region');
+  } catch (error) {
+    console.warn('Unable to load region codes from Intl.supportedValuesOf:', error);
+    return [];
+  }
 };
 
 const Register = () => {

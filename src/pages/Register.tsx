@@ -186,7 +186,7 @@ const Register = () => {
       setLoading(false);
       return;
     } else {
-      toast.success('Registration submitted successfully! We will email you with next steps.');
+      toast.success('Registration submitted successfully! You can login now.');
       navigate('/login');
     }
 

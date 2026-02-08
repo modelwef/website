@@ -1,13 +1,16 @@
 import { motion } from 'framer-motion';
-import { FileText, Download } from 'lucide-react';
+import { FileText } from 'lucide-react';
+
+import { ResourceDownloadButton } from '@/components/ui/ResourceDownloadButton';
 
 interface ResourceCardProps {
   title: string;
   description: string;
   index: number;
+  url?: string;
 }
 
-export const ResourceCard = ({ title, description, index }: ResourceCardProps) => {
+export const ResourceCard = ({ title, description, index, url }: ResourceCardProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -25,13 +28,7 @@ export const ResourceCard = ({ title, description, index }: ResourceCardProps) =
         </h4>
         <p className="text-sm text-muted-foreground">{description}</p>
       </div>
-      <button
-        className="flex-shrink-0 px-4 py-2 border border-border rounded-md text-sm font-medium text-muted-foreground hover:border-accent hover:text-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        disabled
-      >
-        <Download size={16} className="inline mr-1" />
-        PDF
-      </button>
+      <ResourceDownloadButton url={url} />
     </motion.div>
   );
 };

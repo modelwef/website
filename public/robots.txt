@@ -6,5 +6,5 @@ Disallow: /login
 Disallow: /forgot-password
 Disallow: /reset-password
 
-Sitemap: https://www.modelwef.com/sitemap.xml
-Host: www.modelwef.com
+Sitemap: https://modelwef.org/sitemap.xml
+Host: modelwef.org

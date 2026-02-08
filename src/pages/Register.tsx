@@ -10,12 +10,8 @@ import { User, School, Globe, BookOpen, CreditCard, CheckCircle, ArrowRight, Loc
 import { committees } from '@/data/committees';
 import { allCountries, institutions } from '@/data/countries';
 
-const countryCodeToFlagEmoji = (code: string) =>
-  code
-    .toUpperCase()
-    .split('')
-    .map((char) => String.fromCodePoint(127397 + char.charCodeAt(0)))
-    .join('');
+const countryCodeToFlagUrl = (code: string) =>
+  `https://flagcdn.com/w40/${code.toLowerCase()}.png`;
 
 const getRegionCodes = () => {
   const intl = Intl as typeof Intl & { supportedValuesOf?: (key: string) => string[] };
@@ -71,7 +67,14 @@ const Register = () => {
         return {
           value: name,
           label: name,
-          icon: countryCodeToFlagEmoji(code),
+          icon: (
+            <img
+              src={countryCodeToFlagUrl(code)}
+              alt={`${name} flag`}
+              className="h-4 w-6 shrink-0 rounded-sm object-cover"
+              loading="lazy"
+            />
+          ),
           searchValue: `${name} ${code}`,
         };
       })

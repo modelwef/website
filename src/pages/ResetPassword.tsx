@@ -32,13 +32,19 @@ const ResetPassword = () => {
 
     setLoading(true);
 
-    const { error } = await supabase.functions.invoke('password-reset', {
-      body: { token, password },
+    const { data, error } = await supabase.rpc('consume_delegate_password_reset', {
+      _token: token,
+      _new_password: password,
     });
 
     if (error) {
       toast.error(error.message || 'Unable to reset password.');
     } else {
+      if (!data) {
+        toast.error('This reset link is invalid or expired.');
+        setLoading(false);
+        return;
+      }
       toast.success('Password updated successfully. Please log in.');
       navigate('/login');
     }

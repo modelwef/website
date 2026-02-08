@@ -10,19 +10,24 @@ import { Mail, ArrowRight } from 'lucide-react';
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resetLink, setResetLink] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setResetLink(null);
 
-    const { error } = await supabase.functions.invoke('password-reset-request', {
-      body: { email },
+    const { data, error } = await supabase.rpc('request_delegate_password_reset', {
+      _email: email,
     });
 
     if (error) {
       toast.error(error.message || 'Unable to send reset email.');
     } else {
-      toast.success('If that email exists, a reset link has been sent.');
+      if (data) {
+        setResetLink(`${window.location.origin}/reset-password?token=${data}`);
+      }
+      toast.success('If that email exists, a reset link has been created.');
     }
 
     setLoading(false);
@@ -78,6 +83,13 @@ const ForgotPassword = () => {
                   )}
                 </button>
               </div>
+
+              {resetLink && (
+                <div className="mt-4 rounded-lg border border-border bg-muted/40 p-4 text-sm">
+                  <p className="font-medium text-foreground">Reset link (copy/paste):</p>
+                  <p className="mt-2 break-all text-foreground/80">{resetLink}</p>
+                </div>
+              )}
 
               <div className="mt-6 text-center">
                 <Link to="/login" className="text-sm text-accent hover:underline font-medium">

@@ -1,13 +1,26 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Layout } from '@/components/layout/Layout';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { SearchableSelect, SearchableSelectOption } from '@/components/ui/searchable-select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { User, School, Globe, BookOpen, CreditCard, CheckCircle, ArrowRight, Lock, Eye, EyeOff } from 'lucide-react';
 import { committees } from '@/data/committees';
 import { allCountries, institutions } from '@/data/countries';
+
+const countryCodeToFlagEmoji = (code: string) =>
+  code
+    .toUpperCase()
+    .split('')
+    .map((char) => String.fromCodePoint(127397 + char.charCodeAt(0)))
+    .join('');
+
+const getRegionCodes = () => {
+  const intl = Intl as typeof Intl & { supportedValuesOf?: (key: string) => string[] };
+  return intl.supportedValuesOf ? intl.supportedValuesOf('region') : [];
+};
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -27,6 +40,69 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
+  const gradeOptions = useMemo<SearchableSelectOption[]>(
+    () =>
+      ['Year 7', 'Year 8', 'Year 9', 'Year 10', 'Year 11', 'Year 12']
+        .sort((a, b) => a.localeCompare(b))
+        .map((grade) => ({
+          value: grade,
+          label: grade,
+          searchValue: grade,
+        })),
+    [],
+  );
+  const countryOptions = useMemo<SearchableSelectOption[]>(() => {
+    const displayNames = new Intl.DisplayNames(['en'], { type: 'region' });
+    const options = getRegionCodes()
+      .filter((code) => code.length === 2)
+      .map((code) => {
+        const name = displayNames.of(code);
+        if (!name) {
+          return null;
+        }
+        return {
+          value: name,
+          label: name,
+          icon: countryCodeToFlagEmoji(code),
+          searchValue: `${name} ${code}`,
+        };
+      })
+      .filter(Boolean) as SearchableSelectOption[];
+
+    if (options.length > 0) {
+      return options.sort((a, b) => a.label.localeCompare(b.label));
+    }
+
+    return allCountries
+      .map((country) => ({
+        value: country,
+        label: country,
+        searchValue: country,
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, []);
+  const institutionOptions = useMemo<SearchableSelectOption[]>(
+    () =>
+      [...institutions]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((inst) => ({
+          value: inst.abbreviation,
+          label: `${inst.name} (${inst.abbreviation})`,
+          searchValue: `${inst.name} ${inst.abbreviation}`,
+        })),
+    [],
+  );
+  const committeeOptions = useMemo<SearchableSelectOption[]>(
+    () =>
+      [...committees]
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map((committee) => ({
+          value: committee.abbreviation,
+          label: `${committee.name} (${committee.abbreviation}) - ${committee.categoryShort}`,
+          searchValue: `${committee.name} ${committee.abbreviation} ${committee.categoryShort}`,
+        })),
+    [],
+  );
   const splitName = (fullName: string) => {
     const trimmed = fullName.trim();
     if (!trimmed) {
@@ -44,6 +120,11 @@ const Register = () => {
 
     if (!formData.agreeTerms) {
       toast.error('Please agree to the terms and conditions');
+      return;
+    }
+
+    if (!formData.grade) {
+      toast.error('Please select your grade/year');
       return;
     }
 
@@ -207,17 +288,14 @@ const Register = () => {
                     </div>
                     <div>
                       <label className="form-label">Grade/Year *</label>
-                      <select
-                        className="form-input"
+                      <SearchableSelect
                         value={formData.grade}
-                        onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
-                        required
-                      >
-                        <option value="">Select grade</option>
-                        {[7, 8, 9, 10, 11, 12].map((grade) => (
-                          <option key={grade} value={`Year ${grade}`}>Year {grade}</option>
-                        ))}
-                      </select>
+                        onValueChange={(value) => setFormData({ ...formData, grade: value })}
+                        options={gradeOptions}
+                        placeholder="Select grade"
+                        searchPlaceholder="Search grade"
+                        emptyMessage="No grades found."
+                      />
                     </div>
                   </div>
                 </div>
@@ -260,32 +338,26 @@ const Register = () => {
                     {formData.delegationType === 'country' ? (
                       <div>
                         <label className="form-label">Preferred Country</label>
-                        <select
-                          className="form-input"
+                        <SearchableSelect
                           value={formData.preferredCountry}
-                          onChange={(e) => setFormData({ ...formData, preferredCountry: e.target.value })}
-                        >
-                          <option value="">Select country preference</option>
-                          {allCountries.map((country) => (
-                            <option key={country} value={country}>{country}</option>
-                          ))}
-                        </select>
+                          onValueChange={(value) => setFormData({ ...formData, preferredCountry: value })}
+                          options={countryOptions}
+                          placeholder="Select country preference"
+                          searchPlaceholder="Search countries"
+                          emptyMessage="No countries found."
+                        />
                       </div>
                     ) : (
                       <div>
                         <label className="form-label">Preferred Institution</label>
-                        <select
-                          className="form-input"
+                        <SearchableSelect
                           value={formData.preferredInstitution}
-                          onChange={(e) => setFormData({ ...formData, preferredInstitution: e.target.value })}
-                        >
-                          <option value="">Select institution preference</option>
-                          {institutions.map((inst) => (
-                            <option key={inst.abbreviation} value={inst.abbreviation}>
-                              {inst.name} ({inst.abbreviation})
-                            </option>
-                          ))}
-                        </select>
+                          onValueChange={(value) => setFormData({ ...formData, preferredInstitution: value })}
+                          options={institutionOptions}
+                          placeholder="Select institution preference"
+                          searchPlaceholder="Search institutions"
+                          emptyMessage="No institutions found."
+                        />
                       </div>
                     )}
                   </div>
@@ -299,18 +371,14 @@ const Register = () => {
                   </h3>
                   <div>
                     <label className="form-label">Preferred Committee</label>
-                    <select
-                      className="form-input"
+                    <SearchableSelect
                       value={formData.committeePreference}
-                      onChange={(e) => setFormData({ ...formData, committeePreference: e.target.value })}
-                    >
-                      <option value="">Select committee preference</option>
-                      {committees.map((committee) => (
-                        <option key={committee.id} value={committee.abbreviation}>
-                          {committee.name} ({committee.abbreviation}) - {committee.categoryShort}
-                        </option>
-                      ))}
-                    </select>
+                      onValueChange={(value) => setFormData({ ...formData, committeePreference: value })}
+                      options={committeeOptions}
+                      placeholder="Select committee preference"
+                      searchPlaceholder="Search committees"
+                      emptyMessage="No committees found."
+                    />
                   </div>
                 </div>
 

@@ -96,7 +96,7 @@ const Countries = () => {
       {/* Selection Info */}
       <section className="py-16 bg-primary text-primary-foreground">
         <div className="section-container text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">Delegation Assignment</h2>
+          <h2 className="text-2xl md:text-3xl font-bold mb-4 text-primary-foreground">Delegation Assignment</h2>
           <p className="text-white/80 max-w-2xl mx-auto">
             Country and institutional assignments will be made after registration closes. Delegates can indicate preferences, but final assignments are based on availability and conference balance.
           </p>

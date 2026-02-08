@@ -396,7 +396,7 @@ const Register = () => {
               <div
                 className="bg-primary text-white rounded-lg p-6"
               >
-                <h3 className="text-lg font-semibold mb-4">Important Dates</h3>
+                <h3 className="text-lg font-semibold mb-4 text-white">Important Dates</h3>
                 <ul className="space-y-3 text-sm">
                   <li className="flex justify-between">
                     <span className="text-white/70">Conference Date</span>

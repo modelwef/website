@@ -2,9 +2,13 @@ import { motion } from 'framer-motion';
 import { Layout } from '@/components/layout/Layout';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { Mic, FileText, Download, MessageSquare, Users, Zap } from 'lucide-react';
+import { Mic, FileText, MessageSquare, Users, Zap } from 'lucide-react';
+
+import { ResourceDownloadButton } from '@/components/ui/ResourceDownloadButton';
 
 const ResourcesSpeaking = () => {
+  const resourceBaseUrl = 'https://modelwef.org/resources/pdfs';
+
   const debateTips = [
     { title: 'Structure Your Arguments', tips: ['Use claim-evidence-impact format', 'Lead with your strongest point', 'Anticipate counterarguments', 'Prepare rebuttals in advance'] },
     { title: 'Delivery Techniques', tips: ['Maintain eye contact with judges', 'Vary your vocal pace and tone', 'Use strategic pauses for emphasis', 'Project confidence even when uncertain'] },
@@ -25,7 +29,11 @@ const ResourcesSpeaking = () => {
                   <h2 className="text-2xl font-bold text-foreground">Debate Handbook</h2>
                 </div>
                 <p className="text-muted-foreground mb-6">Comprehensive guide to effective debate techniques, argumentation strategies, and economic reasoning for Round 2.</p>
-                <button className="btn-primary flex items-center gap-2"><Download size={18} />Download Handbook (Coming Soon)</button>
+                <ResourceDownloadButton
+                  url={`${resourceBaseUrl}/debate-handbook.pdf`}
+                  label="Download Handbook"
+                  variant="primary"
+                />
               </motion.div>
 
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-card border border-border rounded-lg p-8" style={{ boxShadow: 'var(--shadow-card)' }}>
@@ -34,7 +42,11 @@ const ResourcesSpeaking = () => {
                   <h2 className="text-2xl font-bold text-foreground">Delegate Handbook</h2>
                 </div>
                 <p className="text-muted-foreground mb-6">Everything you need to know about participating in MWEF as a delegate, from preparation to conference day.</p>
-                <button className="btn-outline flex items-center gap-2"><Download size={18} />Download (Coming Soon)</button>
+                <ResourceDownloadButton
+                  url={`${resourceBaseUrl}/delegate-handbook.pdf`}
+                  label="Download"
+                  variant="outline"
+                />
               </motion.div>
             </div>
 

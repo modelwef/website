@@ -25,10 +25,11 @@ const Resources = () => {
           <div className="space-y-4 max-w-3xl">
             {delegateResources.map((resource, index) => (
               <ResourceCard
-                key={index}
+                key={resource.title}
                 title={resource.title}
                 description={resource.description}
                 index={index}
+                url={resource.url}
               />
             ))}
           </div>

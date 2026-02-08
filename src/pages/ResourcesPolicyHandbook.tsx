@@ -2,9 +2,13 @@ import { motion } from 'framer-motion';
 import { Layout } from '@/components/layout/Layout';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { SectionHeader } from '@/components/ui/SectionHeader';
-import { FileText, Download, BookOpen, TrendingUp, BarChart3, Lightbulb } from 'lucide-react';
+import { FileText, BookOpen, TrendingUp, BarChart3, Lightbulb } from 'lucide-react';
+
+import { ResourceDownloadButton } from '@/components/ui/ResourceDownloadButton';
 
 const ResourcesPolicyHandbook = () => {
+  const resourceBaseUrl = 'https://modelwef.org/resources/pdfs';
+
   const economicConcepts = [
     { title: 'Opportunity Cost', desc: 'The value of the next best alternative foregone when making a decision.' },
     { title: 'Marginal Analysis', desc: 'Examining incremental changes to determine optimal decisions.' },
@@ -28,7 +32,11 @@ const ResourcesPolicyHandbook = () => {
                   <h2 className="text-2xl font-bold text-foreground">Policy Proposal Handbook</h2>
                 </div>
                 <p className="text-muted-foreground mb-6">The official guide to writing winning policy proposals at MWEF. Learn the structure, evaluation criteria, and best practices.</p>
-                <button className="btn-primary flex items-center gap-2"><Download size={18} />Download Handbook (Coming Soon)</button>
+                <ResourceDownloadButton
+                  url={`${resourceBaseUrl}/policy-proposal-handbook.pdf`}
+                  label="Download Handbook"
+                  variant="primary"
+                />
               </motion.div>
 
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-card border border-border rounded-lg p-8" style={{ boxShadow: 'var(--shadow-card)' }}>
@@ -37,7 +45,11 @@ const ResourcesPolicyHandbook = () => {
                   <h2 className="text-2xl font-bold text-foreground">Brief Economics Rundown</h2>
                 </div>
                 <p className="text-muted-foreground mb-6">A concise introduction to essential economic concepts and frameworks needed for MWEF participation.</p>
-                <button className="btn-outline flex items-center gap-2"><Download size={18} />Download (Coming Soon)</button>
+                <ResourceDownloadButton
+                  url={`${resourceBaseUrl}/economics-rundown.pdf`}
+                  label="Download"
+                  variant="outline"
+                />
               </motion.div>
             </div>
 

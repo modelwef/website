@@ -1,5 +1,5 @@
-export const siteUrl = "https://www.modelwef.com";
-export const siteHost = "www.modelwef.com";
+export const siteUrl = "https://modelwef.org";
+export const siteHost = "modelwef.org";
 
 export const robotsTxt = `User-agent: *
 Allow: /

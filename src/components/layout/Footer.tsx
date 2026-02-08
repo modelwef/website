@@ -75,7 +75,7 @@ export const Footer = () => {
               </li>
               <li className="flex items-center gap-3 text-white/70 text-sm">
                 <Globe size={16} className="text-accent" />
-                <span>www.mwef.org</span>
+                <span>modelwef.org</span>
               </li>
             </ul>
           </div>

@@ -14,7 +14,7 @@ export const Footer = () => {
               <span className="font-bold text-xl">MWEF</span>
             </Link>
             <p className="text-white/70 text-sm leading-relaxed">
-              Model World Economic Forum — Dubai's premier economics competition where students design real-world economic solutions.
+              Model World Economic Forum - Dubai's premier economics competition where students design real-world economic solutions.
             </p>
           </div>
 
@@ -67,7 +67,7 @@ export const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-center gap-3 text-white/70 text-sm">
                 <Mail size={16} className="text-accent" />
-                <span>info@mwef.org</span>
+                <span>modelwef@gmail.com</span>
               </li>
               <li className="flex items-center gap-3 text-white/70 text-sm">
                 <MapPin size={16} className="text-accent" />

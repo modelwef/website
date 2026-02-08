@@ -93,6 +93,9 @@ export const Footer = () => {
             <Link to="/terms" className="text-white/50 hover:text-white transition-colors">
               Terms of Service
             </Link>
+            <p className="text-xs sm:text-sm">
+              Made by <a href="https://anshgupta.site" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Ansh Gupta</a>
+            </p>
           </div>
         </div>
       </div>

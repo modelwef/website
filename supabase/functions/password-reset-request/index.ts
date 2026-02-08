@@ -84,6 +84,12 @@ serve(async (req) => {
   const tokenHash = await hashToken(token);
   const expiresAt = new Date(Date.now() + 30 * 60 * 1000).toISOString();
 
+  await supabase
+    .from("delegate_password_resets")
+    .delete()
+    .eq("email", email)
+    .is("used_at", null);
+
   const { error: insertError } = await supabase
     .from("delegate_password_resets")
     .insert({

@@ -5,7 +5,7 @@ const stats = [
   {
     icon: Users,
     value: '250+',
-    label: 'Expected Delegates',
+    label: 'Expected Participants',
   },
   {
     icon: Award,

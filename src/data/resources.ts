@@ -7,7 +7,7 @@ export interface Resource {
 
 const resourceBaseUrl = 'https://modelwef.org/resources/pdfs';
 
-export const delegateResources: Resource[] = [
+export const participantResources: Resource[] = [
   {
     title: 'Conference Rules',
     description: 'Complete rules and procedures for the MWEF conference, including debate formats and scoring criteria.',
@@ -28,7 +28,7 @@ export const delegateResources: Resource[] = [
   },
   {
     title: 'Code of Conduct & Procedures',
-    description: 'Behavioral expectations, dress code, and procedural guidelines for all delegates.',
+    description: 'Behavioral expectations, dress code, and procedural guidelines for all participants.',
     fileType: 'PDF',
     url: `${resourceBaseUrl}/code-of-conduct.pdf`,
   },

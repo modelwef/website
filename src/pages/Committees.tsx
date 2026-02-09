@@ -20,7 +20,7 @@ const Committees = () => {
         <div className="section-container">
           <SectionHeader
             title="Senior Committees"
-            subtitle="Advanced forums for experienced delegates tackling complex macroeconomic and global policy challenges."
+            subtitle="Advanced forums for experienced participants tackling complex macroeconomic and global policy challenges."
           />
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -44,7 +44,7 @@ const Committees = () => {
         <div className="section-container">
           <SectionHeader
             title="Junior Committees"
-            subtitle="Introductory forums designed for newer delegates to engage with foundational economic concepts and debates."
+            subtitle="Introductory forums designed for newer participants to engage with foundational economic concepts and debates."
           />
 
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl">

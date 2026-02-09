@@ -2,14 +2,14 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { supabase } from '@/integrations/supabase/client';
 
 interface AuthContextType {
-  user: DelegateUser | null;
+  user: ParticipantUser | null;
   loading: boolean;
   isAdmin: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
-interface DelegateUser {
+interface ParticipantUser {
   id: string;
   email: string;
   first_name: string;
@@ -17,10 +17,10 @@ interface DelegateUser {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-const STORAGE_KEY = 'delegate_session';
+const STORAGE_KEY = 'participant_session';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<DelegateUser | null>(null);
+  const [user, setUser] = useState<ParticipantUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       try {
-        setUser(JSON.parse(stored) as DelegateUser);
+        setUser(JSON.parse(stored) as ParticipantUser);
       } catch {
         localStorage.removeItem(STORAGE_KEY);
       }
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.rpc('authenticate_delegate', {
+    const { data, error } = await supabase.rpc('authenticate_participant', {
       _email: email,
       _password: password,
     });
@@ -46,14 +46,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return { error };
     }
 
-    const delegate = Array.isArray(data) ? data[0] : null;
+    const participant = Array.isArray(data) ? data[0] : null;
 
-    if (!delegate) {
+    if (!participant) {
       return { error: new Error('Invalid email or password') };
     }
 
-    setUser(delegate);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(delegate));
+    setUser(participant);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(participant));
     return { error: null };
   };
 

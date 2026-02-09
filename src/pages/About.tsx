@@ -20,7 +20,7 @@ const About = () => {
                 Inspired by the World Economic Forum, the Model World Economic Forum (MWEF) is an advanced academic simulation that places students in the role of policymakers, economists, corporate leaders, and international institutions.
               </p>
               <p>
-                Delegates will represent nations and global economic bodies, engaging in structured economic debate, policy drafting, and strategic decision-making under real-world constraints such as trade-offs, limited resources, political feasibility, and long-term consequences.
+                Participants will represent nations and global economic bodies, engaging in structured economic debate, policy drafting, and strategic decision-making under real-world constraints such as trade-offs, limited resources, political feasibility, and long-term consequences.
               </p>
               <p>
                 This conference challenges students to think critically about the world's most pressing economic issues, from sustainable development and income inequality to financial stability and the digital economy.
@@ -35,7 +35,7 @@ const About = () => {
           <div className="grid lg:grid-cols-3 gap-8">
             {[
               { title: 'Our Mission', content: 'To cultivate the next generation of economic leaders by providing a platform for rigorous debate, policy analysis, and strategic thinking on global economic challenges.' },
-              { title: 'Our Vision', content: 'To become the leading economics simulation conference in the region, recognized for academic excellence, professional standards, and meaningful delegate experiences.' },
+              { title: 'Our Vision', content: 'To become the leading economics simulation conference in the region, recognized for academic excellence, professional standards, and meaningful participant experiences.' },
               { title: 'Our Values', content: 'Academic rigor, evidence-based reasoning, inclusive participation, global perspective, and commitment to understanding complex economic trade-offs.' },
             ].map((item, index) => (
               <motion.div

@@ -34,8 +34,8 @@ const Login = () => {
   return (
     <Layout>
       <PageHeader
-        title="Delegate Login"
-        subtitle="Access your MWEF delegate dashboard and manage your registration."
+        title="Participant Login"
+        subtitle="Access your MWEF participant dashboard and manage your registration."
       />
 
       <section className="py-20 bg-background">
@@ -64,7 +64,7 @@ const Login = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    placeholder="delegate@example.com"
+                    placeholder="participant@example.com"
                   />
                 </div>
 

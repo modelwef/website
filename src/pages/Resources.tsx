@@ -2,7 +2,7 @@ import { Layout } from '@/components/layout/Layout';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { ResourceCard } from '@/components/cards/ResourceCard';
-import { delegateResources } from '@/data/resources';
+import { participantResources } from '@/data/resources';
 import { motion } from 'framer-motion';
 import { Info } from 'lucide-react';
 
@@ -10,7 +10,7 @@ const Resources = () => {
   return (
     <Layout>
       <PageHeader
-        title="Delegate Resources"
+        title="Participant Resources"
         subtitle="Access essential documents, handbooks, and guides to prepare for MWEF."
       />
 
@@ -23,7 +23,7 @@ const Resources = () => {
           />
 
           <div className="space-y-4 max-w-3xl">
-            {delegateResources.map((resource, index) => (
+            {participantResources.map((resource, index) => (
               <ResourceCard
                 key={resource.title}
                 title={resource.title}

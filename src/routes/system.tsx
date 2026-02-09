@@ -135,7 +135,7 @@ export default function SystemPage() {
       <hr style={{ margin: "18px 0" }} />
 
       <div style={{ opacity: 0.85 }}>
-        Put your admin UI here (upload / manage delegates / etc).
+        Put your admin UI here (upload / manage participants / etc).
       </div>
     </main>
   )

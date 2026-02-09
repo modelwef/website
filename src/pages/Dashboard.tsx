@@ -62,7 +62,7 @@ const Dashboard = () => {
       
       // Fetch registration
       const { data: regData, error: regError } = await supabase
-        .from('delegate_registrations')
+        .from('participant_registrations')
         .select('*')
         .eq('email', registrationEmail)
         .maybeSingle();
@@ -110,8 +110,8 @@ const Dashboard = () => {
   return (
     <Layout>
       <PageHeader
-        title="Delegate Dashboard"
-        subtitle={`Welcome back, ${user ? `${user.first_name} ${user.last_name}`.trim() : 'Delegate'}!`}
+        title="Participant Dashboard"
+        subtitle={`Welcome back, ${user ? `${user.first_name} ${user.last_name}`.trim() : 'Participant'}!`}
       />
 
       <section className="py-20 bg-background">
@@ -338,7 +338,7 @@ const Dashboard = () => {
                 </ul>
               </motion.div>
 
-              {/* Delegate Checklist */}
+              {/* Participant Checklist */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -348,7 +348,7 @@ const Dashboard = () => {
               >
                 <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                   <BadgeCheck size={18} className="text-accent" />
-                  Delegate Checklist
+                  Participant Checklist
                 </h3>
                 <ul className="space-y-3 text-sm text-muted-foreground">
                   <li className="flex items-center justify-between">

@@ -20,8 +20,8 @@ export const committees: Committee[] = [
     abbreviation: 'GES',
     category: 'Senior Category 1',
     categoryShort: 'Senior',
-    overview: 'The Global Economic Strategy Forum (GES) focuses on long-term macroeconomic planning, global coordination, and strategic economic decision-making at the highest level. Delegates in this forum will engage with broad economic challenges that affect global growth, stability, and cooperation.',
-    round1Info: 'Placeholder information to be released closer to the conference. Delegates will be introduced to overarching global economic challenges.',
+    overview: 'The Global Economic Strategy Forum (GES) focuses on long-term macroeconomic planning, global coordination, and strategic economic decision-making at the highest level. Participants in this forum will engage with broad economic challenges that affect global growth, stability, and cooperation.',
+    round1Info: 'Placeholder information to be released closer to the conference. Participants will be introduced to overarching global economic challenges.',
     round2Info: 'Advanced strategic debate topics will be added later. This will be a debate on a certain policy implemented in the domain of that committee, and it will be a 5 (proposition) vs 5 (opposition) debate.',
   },
   {
@@ -41,7 +41,7 @@ export const committees: Committee[] = [
       'Evaluate the economic costs and benefits of these policies (jobs, prices, investment)',
       'Pitch a new policy or improve an existing policy and create an economic evaluation of your proposed policy',
     ],
-    round1Info: 'Delegates will address the challenge of balancing economic development with environmental sustainability.',
+    round1Info: 'Participants will address the challenge of balancing economic development with environmental sustainability.',
     round2Info: 'Policy debate on sustainable development measures - 5 vs 5 structured debate format.',
   },
   {
@@ -61,7 +61,7 @@ export const committees: Committee[] = [
       'Analyse how wage changes affect employment, consumer spending, and investment',
       'Prepare arguments showing both the risks and benefits of improving wages',
     ],
-    round1Info: 'Delegates will examine wage policies and corporate responsibility from their assigned stakeholder perspective.',
+    round1Info: 'Participants will examine wage policies and corporate responsibility from their assigned stakeholder perspective.',
     round2Info: 'Policy debate on corporate ethics measures - 5 vs 5 structured debate format.',
   },
   {
@@ -81,7 +81,7 @@ export const committees: Committee[] = [
       'Evaluate how technology can create new jobs as well as replace old ones',
       'Prepare examples showing both risks and opportunities of automation',
     ],
-    round1Info: 'Delegates will address the labor market challenges posed by technological advancement.',
+    round1Info: 'Participants will address the labor market challenges posed by technological advancement.',
     round2Info: 'Policy debate on digital economy measures - 5 vs 5 structured debate format.',
   },
   {
@@ -100,7 +100,7 @@ export const committees: Committee[] = [
       'Study how central banks and governments respond to inflation',
       'Evaluate the risks of both high inflation and aggressive inflation control',
     ],
-    round1Info: 'Delegates will propose monetary and fiscal policy solutions to address inflation challenges.',
+    round1Info: 'Participants will propose monetary and fiscal policy solutions to address inflation challenges.',
     round2Info: 'Policy debate on monetary policy measures - 5 vs 5 structured debate format.',
   },
   {
@@ -120,7 +120,7 @@ export const committees: Committee[] = [
       'Study social spending, education, and tax policies',
       'Analyse how inclusion can strengthen long-term growth',
     ],
-    round1Info: 'Delegates will develop policies to ensure economic growth is broadly shared.',
+    round1Info: 'Participants will develop policies to ensure economic growth is broadly shared.',
     round2Info: 'Policy debate on inclusive growth measures - 5 vs 5 structured debate format.',
   },
   {
@@ -139,7 +139,7 @@ export const committees: Committee[] = [
       'Study historical cases of sanctions and economic adaptation',
       'Evaluate short-term versus long-term responses',
     ],
-    round1Info: 'Delegates will develop economic resilience strategies in response to sanctions.',
+    round1Info: 'Participants will develop economic resilience strategies in response to sanctions.',
     round2Info: 'Policy debate on sanctions response measures - 5 vs 5 structured debate format.',
   },
 ];

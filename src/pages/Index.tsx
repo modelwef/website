@@ -25,7 +25,7 @@ const features = [
   {
     icon: Trophy,
     title: 'Competitive Excellence',
-    description: 'Awards for Best Delegate, Best Speaker, and Committee Winners across all forums.',
+    description: 'Awards for Best Participant, Best Speaker, and Committee Winners across all forums.',
   },
   {
     icon: Globe,
@@ -126,7 +126,7 @@ const Index = () => {
               </h2>
               <div className="space-y-4 text-muted-foreground leading-relaxed">
                 <p>
-                  The Model World Economic Forum (MWEF) is more than a competition for high-school students — it is a platform where economic theory meets real-world policy-making. Delegates are challenged to confront complex global economic problems, evaluate trade-offs, and design solutions grounded in rigorous economic reasoning.
+                  The Model World Economic Forum (MWEF) is more than a competition for high-school students — it is a platform where economic theory meets real-world policy-making. Participants are challenged to confront complex global economic problems, evaluate trade-offs, and design solutions grounded in rigorous economic reasoning.
                 </p>
                 <p>
                   At MWEF, classroom learning transforms into structured debate, strategic negotiation, and evidence-based policy formulation, mirroring the discussions that shape global economic decisions today.

@@ -14,7 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      delegate_registrations: {
+      participant_registrations: {
         Row: {
           assigned_committee: string | null
           assigned_country: string | null
@@ -74,7 +74,7 @@ export type Database = {
         }
         Relationships: []
       }
-      delegate_password_resets: {
+      participant_password_resets: {
         Row: {
           created_at: string
           email: string
@@ -188,7 +188,7 @@ export type Database = {
             foreignKeyName: "policy_proposals_registration_id_fkey"
             columns: ["registration_id"]
             isOneToOne: false
-            referencedRelation: "delegate_registrations"
+            referencedRelation: "participant_registrations"
             referencedColumns: ["id"]
           },
         ]
@@ -297,7 +297,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      authenticate_delegate: {
+      authenticate_participant: {
         Args: {
           _email: string
           _password: string
@@ -309,14 +309,14 @@ export type Database = {
           last_name: string
         }[]
       }
-      consume_delegate_password_reset: {
+      consume_participant_password_reset: {
         Args: {
           _token: string
           _new_password: string
         }
         Returns: boolean
       }
-      request_delegate_password_reset: {
+      request_participant_password_reset: {
         Args: {
           _email: string
         }
@@ -329,7 +329,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      register_delegate: {
+      register_participant: {
         Args: {
           _first_name: string
           _last_name: string
@@ -345,7 +345,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "delegate" | "volunteer"
+      app_role: "admin" | "participant" | "volunteer"
       application_status: "pending" | "under_review" | "approved" | "rejected"
       registration_status: "pending" | "approved" | "rejected" | "waitlist"
     }
@@ -475,7 +475,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "delegate", "volunteer"],
+      app_role: ["admin", "participant", "volunteer"],
       application_status: ["pending", "under_review", "approved", "rejected"],
       registration_status: ["pending", "approved", "rejected", "waitlist"],
     },

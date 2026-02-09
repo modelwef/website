@@ -18,7 +18,7 @@ export const executiveTeam: TeamMember[] = [
   { name: 'Sanaya Mithaiwala', role: 'Head of Media', image: '/Sanaya_Mithaiwala.jpg' },
   { name: 'Yingxuan Cha', role: 'Deputy Head of Media', image: '/Yingxuan_Cha.jpeg' },
   { name: 'Khyati Anandita', role: 'Deputy Head of Media', image: '/Khyati_Anandita.jpeg' },
-  { name: 'Marina Sapyrgina', role: 'Deputy Head of Media', image: '/placeholder.svg' },
+  { name: 'Marina Sapyrgina', role: 'Deputy Head of Media', image: '/Marina_Sapyrgina.jpeg' },
   { name: 'Shivank Mishra', role: 'Head of Teaching', image: '/Shivank_Mishra.jpeg' },
   { name: 'Pranav Verma', role: 'Deputy Head of Teaching', image: '/Pranav_Verma.jpeg' },
   { name: 'Alman Bazaz', role: 'Deputy Head of Teaching', image: '/Alman_Bazaz.jpeg' },

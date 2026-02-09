@@ -18,7 +18,7 @@ const Register = () => {
     confirmPassword: '',
     school: '',
     grade: '',
-    delegationType: 'country',
+    delegationType: 'institution',
     preferredInstitution: '',
     committeePreference: '',
     agreeTerms: false,
@@ -36,13 +36,11 @@ const Register = () => {
         'Year 10 / Grade 9',
         'Year 11 / Grade 10',
         'Year 12 / Grade 11',
-      ]
-        .sort((a, b) => a.localeCompare(b))
-        .map((grade) => ({
-          value: grade,
-          label: grade,
-          searchValue: grade,
-        })),
+      ].map((grade) => ({
+        value: grade,
+        label: grade,
+        searchValue: grade,
+      })),
     [],
   );
   const institutionOptions = useMemo<SearchableSelectOption[]>(
@@ -278,52 +276,16 @@ const Register = () => {
                     <Globe className="text-accent" size={20} />
                     Delegation Preferences
                   </h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="form-label">Delegation Type</label>
-                      <div className="flex gap-4">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="radio"
-                            name="delegationType"
-                            value="country"
-                            checked={formData.delegationType === 'country'}
-                            onChange={(e) => setFormData({ ...formData, delegationType: e.target.value })}
-                            className="text-accent"
-                          />
-                          <span className="text-foreground">Country</span>
-                        </label>
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <input
-                            type="radio"
-                            name="delegationType"
-                            value="institution"
-                            checked={formData.delegationType === 'institution'}
-                            onChange={(e) => setFormData({ ...formData, delegationType: e.target.value })}
-                            className="text-accent"
-                          />
-                          <span className="text-foreground">Institution</span>
-                        </label>
-                      </div>
-                    </div>
-
-                    {formData.delegationType === 'country' ? (
-                      <div className="rounded-lg border border-dashed border-border bg-secondary/40 p-4 text-sm text-muted-foreground">
-                        Country assignments are provided by the organizing team based on availability.
-                      </div>
-                    ) : (
-                      <div>
-                        <label className="form-label">Preferred Institution</label>
-                        <SearchableSelect
-                          value={formData.preferredInstitution}
-                          onValueChange={(value) => setFormData({ ...formData, preferredInstitution: value })}
-                          options={institutionOptions}
-                          placeholder="Select institution preference"
-                          searchPlaceholder="Search institutions"
-                          emptyMessage="No institutions found."
-                        />
-                      </div>
-                    )}
+                  <div>
+                    <label className="form-label">Preferred Institution</label>
+                    <SearchableSelect
+                      value={formData.preferredInstitution}
+                      onValueChange={(value) => setFormData({ ...formData, preferredInstitution: value })}
+                      options={institutionOptions}
+                      placeholder="Select institution preference"
+                      searchPlaceholder="Search institutions"
+                      emptyMessage="No institutions found."
+                    />
                   </div>
                 </div>
 

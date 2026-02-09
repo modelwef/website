@@ -10,9 +10,9 @@ const Conference = () => {
       number: 1,
       title: 'Solution Proposal Round',
       icon: FileEdit,
-      description: 'One large global economic problem per committee. Each delegate is assigned a distinct stakeholder.',
+      description: 'One large global economic problem per committee. Each participant is assigned a distinct stakeholder.',
       details: [
-        'Delegates submit a typed policy proposal document',
+        'Participants submit a typed policy proposal document',
         'Evaluation based on economic reasoning',
         'Feasibility and cost–benefit analysis assessed',
         'Trade-off awareness and policy clarity evaluated',
@@ -22,7 +22,7 @@ const Conference = () => {
       number: 2,
       title: 'Debate Round',
       icon: MessageSquare,
-      description: 'Committee-specific economic scenarios where delegates choose For or Against positions.',
+      description: 'Committee-specific economic scenarios where participants choose For or Against positions.',
       details: [
         'Team preparation phase',
         'Structured 5 vs 5 debate format',
@@ -34,9 +34,9 @@ const Conference = () => {
       number: 3,
       title: 'Crisis & POI Round',
       icon: AlertTriangle,
-      description: 'Staff introduce intentionally uneconomic or irrational statements for delegates to challenge.',
+      description: 'Staff introduce intentionally uneconomic or irrational statements for participants to challenge.',
       details: [
-        'Delegates respond with Points of Information',
+        'Participants respond with Points of Information',
         'Tests economic intuition and logical correction',
         'Speed of reasoning assessed',
         'Critical thinking under pressure',
@@ -145,7 +145,7 @@ const Conference = () => {
         <div className="section-container">
           <SectionHeader
             title="Evaluation Criteria"
-            subtitle="Delegates are evaluated on multiple dimensions throughout the conference."
+            subtitle="Participants are evaluated on multiple dimensions throughout the conference."
             center
             light
           />
@@ -178,13 +178,13 @@ const Conference = () => {
         <div className="section-container">
           <SectionHeader
             title="Awards & Recognition"
-            subtitle="Outstanding delegates are recognized for their contributions."
+            subtitle="Outstanding participants are recognized for their contributions."
             center
           />
 
           <div className="grid sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
             {[
-              { title: 'Best Delegate', desc: 'Top performer in solution proposals' },
+              { title: 'Best Participant', desc: 'Top performer in solution proposals' },
               { title: 'Best Speaker', desc: 'Outstanding debate and communication' },
               { title: 'Committee Winner', desc: 'Overall excellence within committee' },
             ].map((award, index) => (

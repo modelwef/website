@@ -6,7 +6,7 @@ import { Search, Filter, Edit, Check, X, Users } from 'lucide-react';
 import { committees } from '@/data/committees';
 import { allCountries, institutions } from '@/data/countries';
 
-interface Delegate {
+interface Participant {
   id: string;
   email: string;
   first_name: string;
@@ -24,8 +24,8 @@ interface Delegate {
   created_at: string;
 }
 
-const AdminDelegates = () => {
-  const [delegates, setDelegates] = useState<Delegate[]>([]);
+const AdminParticipants = () => {
+  const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -38,40 +38,40 @@ const AdminDelegates = () => {
     payment_status: '',
   });
 
-  const fetchDelegates = async () => {
+  const fetchParticipants = async () => {
     setLoading(true);
     const { data, error } = await supabase
-      .from('delegate_registrations')
+      .from('participant_registrations')
       .select('*')
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching delegates:', error);
-      toast.error('Failed to fetch delegates');
+      console.error('Error fetching participants:', error);
+      toast.error('Failed to fetch participants');
     } else {
-      setDelegates(data || []);
+      setParticipants(data || []);
     }
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchDelegates();
+    fetchParticipants();
   }, []);
 
-  const handleEdit = (delegate: Delegate) => {
-    setEditingId(delegate.id);
+  const handleEdit = (participant: Participant) => {
+    setEditingId(participant.id);
     setEditForm({
-      assigned_country: delegate.assigned_country || '',
-      assigned_institution: delegate.assigned_institution || '',
-      assigned_committee: delegate.assigned_committee || '',
-      status: delegate.status as 'pending' | 'approved' | 'rejected' | 'waitlist',
-      payment_status: delegate.payment_status || '',
+      assigned_country: participant.assigned_country || '',
+      assigned_institution: participant.assigned_institution || '',
+      assigned_committee: participant.assigned_committee || '',
+      status: participant.status as 'pending' | 'approved' | 'rejected' | 'waitlist',
+      payment_status: participant.payment_status || '',
     });
   };
 
   const handleSave = async (id: string) => {
     const { error } = await supabase
-      .from('delegate_registrations')
+      .from('participant_registrations')
       .update({
         assigned_country: editForm.assigned_country || null,
         assigned_institution: editForm.assigned_institution || null,
@@ -82,21 +82,21 @@ const AdminDelegates = () => {
       .eq('id', id);
 
     if (error) {
-      toast.error('Failed to update delegate');
+      toast.error('Failed to update participant');
     } else {
-      toast.success('Delegate updated successfully');
+      toast.success('Participant updated successfully');
       setEditingId(null);
-      fetchDelegates();
+      fetchParticipants();
     }
   };
 
-  const filteredDelegates = delegates.filter(delegate => {
+  const filteredParticipants = participants.filter(participant => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
-    const delegateName = `${delegate.first_name} ${delegate.last_name}`.trim().toLowerCase();
+    const participantName = `${participant.first_name} ${participant.last_name}`.trim().toLowerCase();
     const matchesSearch = !normalizedSearch
-      || delegate.email.toLowerCase().includes(normalizedSearch)
-      || delegateName.includes(normalizedSearch);
-    const matchesStatus = statusFilter === 'all' || delegate.status === statusFilter;
+      || participant.email.toLowerCase().includes(normalizedSearch)
+      || participantName.includes(normalizedSearch);
+    const matchesStatus = statusFilter === 'all' || participant.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -114,12 +114,12 @@ const AdminDelegates = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Delegate Registrations</h2>
-          <p className="text-muted-foreground">Manage and assign delegations to registered delegates.</p>
+          <h2 className="text-2xl font-bold text-foreground">Participant Registrations</h2>
+          <p className="text-muted-foreground">Manage and assign delegations to registered participants.</p>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Users size={18} />
-          <span>{delegates.length} total delegates</span>
+          <span>{participants.length} total participants</span>
         </div>
       </div>
 
@@ -151,14 +151,14 @@ const AdminDelegates = () => {
           <div className="p-8 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent mx-auto"></div>
           </div>
-        ) : filteredDelegates.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground">No delegates found.</div>
+        ) : filteredParticipants.length === 0 ? (
+          <div className="p-8 text-center text-muted-foreground">No participants found.</div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-secondary">
                 <tr>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-foreground">Delegate</th>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-foreground">Participant</th>
                   <th className="text-left px-4 py-3 text-sm font-medium text-foreground">Preference</th>
                   <th className="text-left px-4 py-3 text-sm font-medium text-foreground">Assignment</th>
                   <th className="text-left px-4 py-3 text-sm font-medium text-foreground">Status</th>
@@ -167,24 +167,24 @@ const AdminDelegates = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {filteredDelegates.map((delegate) => (
-                  <motion.tr key={delegate.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-secondary/50">
+                {filteredParticipants.map((participant) => (
+                  <motion.tr key={participant.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hover:bg-secondary/50">
                     <td className="px-4 py-4">
                       <div className="text-sm">
-                        <p className="text-foreground">{delegate.first_name} {delegate.last_name}</p>
-                        <p className="text-muted-foreground">{delegate.email}</p>
+                        <p className="text-foreground">{participant.first_name} {participant.last_name}</p>
+                        <p className="text-muted-foreground">{participant.email}</p>
                       </div>
                     </td>
                     <td className="px-4 py-4">
                       <div className="text-sm">
-                        <p className="text-foreground capitalize">{delegate.delegation_type}</p>
+                        <p className="text-foreground capitalize">{participant.delegation_type}</p>
                         <p className="text-muted-foreground">
-                          {delegate.delegation_type === 'country' ? delegate.preferred_country : delegate.preferred_institution || '-'}
+                          {participant.delegation_type === 'country' ? participant.preferred_country : participant.preferred_institution || '-'}
                         </p>
                       </div>
                     </td>
                     <td className="px-4 py-4">
-                      {editingId === delegate.id ? (
+                      {editingId === participant.id ? (
                         <div className="space-y-2">
                           <select className="form-input text-sm py-1" value={editForm.assigned_committee} onChange={(e) => setEditForm({ ...editForm, assigned_committee: e.target.value })}>
                             <option value="">Select Committee</option>
@@ -197,13 +197,13 @@ const AdminDelegates = () => {
                         </div>
                       ) : (
                         <div className="text-sm">
-                          <p className="text-foreground">{delegate.assigned_committee || '-'}</p>
-                          <p className="text-muted-foreground">{delegate.assigned_country || delegate.assigned_institution || '-'}</p>
+                          <p className="text-foreground">{participant.assigned_committee || '-'}</p>
+                          <p className="text-muted-foreground">{participant.assigned_country || participant.assigned_institution || '-'}</p>
                         </div>
                       )}
                     </td>
                     <td className="px-4 py-4">
-                      {editingId === delegate.id ? (
+                      {editingId === participant.id ? (
                         <select className="form-input text-sm py-1" value={editForm.status} onChange={(e) => setEditForm({ ...editForm, status: e.target.value as any })}>
                           <option value="pending">Pending</option>
                           <option value="approved">Approved</option>
@@ -211,28 +211,28 @@ const AdminDelegates = () => {
                           <option value="waitlist">Waitlist</option>
                         </select>
                       ) : (
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(delegate.status)}`}>{delegate.status}</span>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(participant.status)}`}>{participant.status}</span>
                       )}
                     </td>
                     <td className="px-4 py-4">
-                      {editingId === delegate.id ? (
+                      {editingId === participant.id ? (
                         <select className="form-input text-sm py-1 capitalize" value={editForm.payment_status} onChange={(e) => setEditForm({ ...editForm, payment_status: e.target.value })}>
                           <option value="">Select payment</option>
                           <option value="paid">Paid</option>
                           <option value="unpaid">Unpaid</option>
                         </select>
                       ) : (
-                        <span className="text-sm text-foreground capitalize">{delegate.payment_status || 'Pending'}</span>
+                        <span className="text-sm text-foreground capitalize">{participant.payment_status || 'Pending'}</span>
                       )}
                     </td>
                     <td className="px-4 py-4">
-                      {editingId === delegate.id ? (
+                      {editingId === participant.id ? (
                         <div className="flex items-center gap-2">
-                          <button onClick={() => handleSave(delegate.id)} className="p-1 text-accent hover:bg-accent/10 rounded"><Check size={18} /></button>
+                          <button onClick={() => handleSave(participant.id)} className="p-1 text-accent hover:bg-accent/10 rounded"><Check size={18} /></button>
                           <button onClick={() => setEditingId(null)} className="p-1 text-destructive hover:bg-destructive/10 rounded"><X size={18} /></button>
                         </div>
                       ) : (
-                        <button onClick={() => handleEdit(delegate)} className="p-1 text-accent hover:bg-accent/10 rounded"><Edit size={18} /></button>
+                        <button onClick={() => handleEdit(participant)} className="p-1 text-accent hover:bg-accent/10 rounded"><Edit size={18} /></button>
                       )}
                     </td>
                   </motion.tr>
@@ -246,4 +246,4 @@ const AdminDelegates = () => {
   );
 };
 
-export default AdminDelegates;
+export default AdminParticipants;

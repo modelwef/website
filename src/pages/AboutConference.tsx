@@ -10,22 +10,22 @@ const AboutConference = () => {
       number: 1,
       title: 'Solution Proposal Round',
       icon: FileEdit,
-      description: 'One large global economic problem per committee. Each delegate is assigned a distinct stakeholder.',
-      details: ['Delegates submit a typed policy proposal document', 'Evaluation based on economic reasoning', 'Feasibility and cost–benefit analysis assessed', 'Trade-off awareness and policy clarity evaluated'],
+      description: 'One large global economic problem per committee. Each participant is assigned a distinct stakeholder.',
+      details: ['Participants submit a typed policy proposal document', 'Evaluation based on economic reasoning', 'Feasibility and cost–benefit analysis assessed', 'Trade-off awareness and policy clarity evaluated'],
     },
     {
       number: 2,
       title: 'Debate Round',
       icon: MessageSquare,
-      description: 'Committee-specific economic scenarios where delegates choose For or Against positions.',
+      description: 'Committee-specific economic scenarios where participants choose For or Against positions.',
       details: ['Team preparation phase', 'Structured 5 vs 5 debate format', 'Chairs award Committee Winner', 'Best Speaker of Conference recognized'],
     },
     {
       number: 3,
       title: 'Crisis & POI Round',
       icon: AlertTriangle,
-      description: 'Staff introduce intentionally uneconomic or irrational statements for delegates to challenge.',
-      details: ['Delegates respond with Points of Information', 'Tests economic intuition and logical correction', 'Speed of reasoning assessed', 'Critical thinking under pressure'],
+      description: 'Staff introduce intentionally uneconomic or irrational statements for participants to challenge.',
+      details: ['Participants respond with Points of Information', 'Tests economic intuition and logical correction', 'Speed of reasoning assessed', 'Critical thinking under pressure'],
     },
   ];
 
@@ -84,7 +84,7 @@ const AboutConference = () => {
 
       <section className="py-20 bg-primary text-primary-foreground">
         <div className="section-container">
-          <SectionHeader title="Evaluation Criteria" subtitle="Delegates are evaluated on multiple dimensions throughout the conference." center light />
+          <SectionHeader title="Evaluation Criteria" subtitle="Participants are evaluated on multiple dimensions throughout the conference." center light />
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { title: 'Economic Reasoning', desc: 'Quality of economic analysis and understanding of concepts' },

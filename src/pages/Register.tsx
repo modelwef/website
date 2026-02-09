@@ -168,7 +168,7 @@ const Register = () => {
       `School: ${formData.school}`,
       `Grade: ${formData.grade}`,
     ].join('\n');
-    const { error: regError } = await supabase.rpc('register_delegate', {
+    const { error: regError } = await supabase.rpc('register_participant', {
       _first_name: firstName,
       _last_name: lastName,
       _email: formData.email,
@@ -214,7 +214,7 @@ const Register = () => {
                 className="bg-card border border-border rounded-lg p-6 md:p-8"
                 style={{ boxShadow: 'var(--shadow-card)' }}
               >
-                <h2 className="text-2xl font-bold text-foreground mb-6">Delegate Registration</h2>
+                <h2 className="text-2xl font-bold text-foreground mb-6">Participant Registration</h2>
 
                 {/* Personal Info */}
                 <div className="mb-8">
@@ -242,7 +242,7 @@ const Register = () => {
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         required
-                        placeholder="delegate@example.com"
+                        placeholder="participant@example.com"
                       />
                     </div>
                   </div>

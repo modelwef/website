@@ -25,7 +25,7 @@ import {
   ChevronDown,
 } from "lucide-react"
 
-interface DelegateRegistration {
+interface ParticipantRegistration {
   id: string
   email: string
   first_name: string
@@ -108,8 +108,8 @@ const SystemDashboard = () => {
   const [authorized, setAuthorized] = useState(initialAuthorized)
   const [userEmail, setUserEmail] = useState<string | null>(null)
 
-  const [delegates, setDelegates] = useState<DelegateRegistration[]>(
-    cachedData?.delegates ?? []
+  const [participants, setParticipants] = useState<ParticipantRegistration[]>(
+    cachedData?.participants ?? []
   )
   const [partnerships, setPartnerships] = useState<PartnershipApplication[]>(
     cachedData?.partnerships ?? []
@@ -126,8 +126,8 @@ const SystemDashboard = () => {
     payment_status: "",
   })
 
-  const defaultDelegateColumns = {
-    delegate: true,
+  const defaultParticipantColumns = {
+    participant: true,
     delegation: true,
     preferences: true,
     assignments: true,
@@ -158,9 +158,9 @@ const SystemDashboard = () => {
     created: true,
   }
 
-  const [delegateColumns, setDelegateColumns] = useState(() => ({
-    ...defaultDelegateColumns,
-    ...(getSavedColumns("system-delegate-columns") ?? {}),
+  const [participantColumns, setParticipantColumns] = useState(() => ({
+    ...defaultParticipantColumns,
+    ...(getSavedColumns("system-participant-columns") ?? {}),
   }))
 
   const [partnershipColumns, setPartnershipColumns] = useState(() => ({
@@ -173,8 +173,8 @@ const SystemDashboard = () => {
     ...(getSavedColumns("system-volunteer-columns") ?? {}),
   }))
 
-  const delegateColumnOptions = [
-    { key: "delegate", label: "Delegate" },
+  const participantColumnOptions = [
+    { key: "participant", label: "Participant" },
     { key: "delegation", label: "Delegation" },
     { key: "preferences", label: "Preferences" },
     { key: "assignments", label: "Assignments" },
@@ -205,9 +205,9 @@ const SystemDashboard = () => {
     { key: "created", label: "Created" },
   ] as const
 
-  const delegateColumnCount = useMemo(
-    () => Object.values(delegateColumns).filter(Boolean).length,
-    [delegateColumns]
+  const participantColumnCount = useMemo(
+    () => Object.values(participantColumns).filter(Boolean).length,
+    [participantColumns]
   )
   const partnershipColumnCount = useMemo(
     () => Object.values(partnershipColumns).filter(Boolean).length,
@@ -220,33 +220,33 @@ const SystemDashboard = () => {
 
   const totals = useMemo(() => {
     return {
-      delegates: delegates.length,
+      participants: participants.length,
       partnerships: partnerships.length,
       volunteers: volunteers.length,
     }
-  }, [delegates, partnerships, volunteers])
+  }, [participants, partnerships, volunteers])
 
   const fetchAllData = async () => {
     setLoading(true)
 
-    const [delegatesRes, partnershipRes, volunteerRes] = await Promise.all([
-      supabase.from("delegate_registrations").select("*").order("created_at", { ascending: false }),
+    const [participantsRes, partnershipRes, volunteerRes] = await Promise.all([
+      supabase.from("participant_registrations").select("*").order("created_at", { ascending: false }),
       supabase.from("partnership_applications").select("*").order("created_at", { ascending: false }),
       supabase.from("volunteer_signups").select("*").order("created_at", { ascending: false }),
     ])
 
-    if (delegatesRes.error) toast.error("Failed to load delegate registrations")
+    if (participantsRes.error) toast.error("Failed to load participant registrations")
     if (partnershipRes.error) toast.error("Failed to load partnerships")
     if (volunteerRes.error) toast.error("Failed to load volunteer signups")
 
-    setDelegates((delegatesRes.data ?? []) as DelegateRegistration[])
+    setParticipants((participantsRes.data ?? []) as ParticipantRegistration[])
     setPartnerships((partnershipRes.data ?? []) as PartnershipApplication[])
     setVolunteers((volunteerRes.data ?? []) as VolunteerSignup[])
 
     sessionStorage.setItem(
       "systemDashboardData",
       JSON.stringify({
-        delegates: delegatesRes.data ?? [],
+        participants: participantsRes.data ?? [],
         partnerships: partnershipRes.data ?? [],
         volunteers: volunteerRes.data ?? [],
         cachedAt: new Date().toISOString(),
@@ -256,19 +256,19 @@ const SystemDashboard = () => {
     setLoading(false)
   }
 
-  const handleEdit = (delegate: DelegateRegistration) => {
-    setEditingId(delegate.id)
+  const handleEdit = (participant: ParticipantRegistration) => {
+    setEditingId(participant.id)
     setEditForm({
-      assigned_country: delegate.assigned_country ?? "",
-      assigned_committee: delegate.assigned_committee ?? "",
-      status: delegate.status ?? "pending",
-      payment_status: delegate.payment_status ?? "",
+      assigned_country: participant.assigned_country ?? "",
+      assigned_committee: participant.assigned_committee ?? "",
+      status: participant.status ?? "pending",
+      payment_status: participant.payment_status ?? "",
     })
   }
 
   const handleSave = async (id: string) => {
     const { error } = await supabase
-      .from("delegate_registrations")
+      .from("participant_registrations")
       .update({
         assigned_country: editForm.assigned_country || null,
         assigned_committee: editForm.assigned_committee || null,
@@ -278,11 +278,11 @@ const SystemDashboard = () => {
       .eq("id", id)
 
     if (error) {
-      toast.error("Failed to update delegate")
+      toast.error("Failed to update participant")
       return
     }
 
-    toast.success("Delegate updated")
+    toast.success("Participant updated")
     setEditingId(null)
     fetchAllData()
   }
@@ -333,7 +333,7 @@ const SystemDashboard = () => {
     sessionStorage.setItem("systemDashboardAuthorized", "true")
     const cached = getCachedData()
     if (cached) {
-      setDelegates(cached.delegates ?? [])
+      setParticipants(cached.participants ?? [])
       setPartnerships(cached.partnerships ?? [])
       setVolunteers(cached.volunteers ?? [])
       setLoading(false)
@@ -357,8 +357,8 @@ const SystemDashboard = () => {
   }, [])
 
   useEffect(() => {
-    setColumnsCookie("system-delegate-columns", delegateColumns)
-  }, [delegateColumns])
+    setColumnsCookie("system-participant-columns", participantColumns)
+  }, [participantColumns])
 
   useEffect(() => {
     setColumnsCookie("system-partnership-columns", partnershipColumns)
@@ -439,7 +439,7 @@ const SystemDashboard = () => {
       <main className="w-full px-6 py-10 space-y-10">
         <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[
-            { label: "Delegates", value: totals.delegates, icon: Users },
+            { label: "Participants", value: totals.participants, icon: Users },
             { label: "Partnerships", value: totals.partnerships, icon: Building2 },
             { label: "Volunteers", value: totals.volunteers, icon: UserCheck },
           ].map((card) => (
@@ -465,7 +465,7 @@ const SystemDashboard = () => {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
               <Database size={20} className="text-accent" />
-              Delegate Registrations
+              Participant Registrations
             </h2>
             <div className="flex items-center gap-3">
               <span className="text-xs text-muted-foreground">Scroll →</span>
@@ -477,12 +477,12 @@ const SystemDashboard = () => {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
-                  {delegateColumnOptions.map((column) => (
+                  {participantColumnOptions.map((column) => (
                     <DropdownMenuCheckboxItem
                       key={column.key}
-                      checked={delegateColumns[column.key]}
+                      checked={participantColumns[column.key]}
                       onCheckedChange={(checked) =>
-                        setDelegateColumns((prev) => ({ ...prev, [column.key]: Boolean(checked) }))
+                        setParticipantColumns((prev) => ({ ...prev, [column.key]: Boolean(checked) }))
                       }
                     >
                       {column.label}
@@ -501,76 +501,76 @@ const SystemDashboard = () => {
               <table className="w-full text-sm min-w-max">
                 <thead className="bg-secondary">
                   <tr className="text-left">
-                    {delegateColumns.delegate && (
-                      <th className="px-4 py-3 font-medium text-foreground">Delegate</th>
+                    {participantColumns.participant && (
+                      <th className="px-4 py-3 font-medium text-foreground">Participant</th>
                     )}
-                    {delegateColumns.delegation && (
+                    {participantColumns.delegation && (
                       <th className="px-4 py-3 font-medium text-foreground">Delegation</th>
                     )}
-                    {delegateColumns.preferences && (
+                    {participantColumns.preferences && (
                       <th className="px-4 py-3 font-medium text-foreground">Preferences</th>
                     )}
-                    {delegateColumns.assignments && (
+                    {participantColumns.assignments && (
                       <th className="px-4 py-3 font-medium text-foreground">Assignments</th>
                     )}
-                    {delegateColumns.status && (
+                    {participantColumns.status && (
                       <th className="px-4 py-3 font-medium text-foreground">Status</th>
                     )}
-                    {delegateColumns.payment && (
+                    {participantColumns.payment && (
                       <th className="px-4 py-3 font-medium text-foreground">Payment</th>
                     )}
-                    {delegateColumns.notes && (
+                    {participantColumns.notes && (
                       <th className="px-4 py-3 font-medium text-foreground">Notes</th>
                     )}
-                    {delegateColumns.created && (
+                    {participantColumns.created && (
                       <th className="px-4 py-3 font-medium text-foreground">Created</th>
                     )}
-                    {delegateColumns.actions && (
+                    {participantColumns.actions && (
                       <th className="px-4 py-3 font-medium text-foreground">Actions</th>
                     )}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {delegates.length === 0 ? (
+                  {participants.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={delegateColumnCount}
+                        colSpan={participantColumnCount}
                         className="px-4 py-6 text-center text-sm text-muted-foreground"
                       >
-                        No delegate registrations found.
+                        No participant registrations found.
                       </td>
                     </tr>
                   ) : (
-                    delegates.map((delegate) => (
-                      <tr key={delegate.id} className="hover:bg-secondary/50">
-                        {delegateColumns.delegate && (
+                    participants.map((participant) => (
+                      <tr key={participant.id} className="hover:bg-secondary/50">
+                        {participantColumns.participant && (
                           <td className="px-4 py-3">
                             <p className="font-medium text-foreground">
-                              {delegate.first_name} {delegate.last_name}
+                              {participant.first_name} {participant.last_name}
                             </p>
-                            <p className="text-xs text-muted-foreground">{delegate.email}</p>
+                            <p className="text-xs text-muted-foreground">{participant.email}</p>
                           </td>
                         )}
-                        {delegateColumns.delegation && (
+                        {participantColumns.delegation && (
                           <td className="px-4 py-3">
-                            <p className="capitalize text-foreground">{delegate.delegation_type}</p>
+                            <p className="capitalize text-foreground">{participant.delegation_type}</p>
                           </td>
                         )}
-                        {delegateColumns.preferences && (
+                        {participantColumns.preferences && (
                           <td className="px-4 py-3">
                             <p className="text-foreground">
-                              {delegate.delegation_type === "country"
-                                ? delegate.preferred_country
-                                : delegate.preferred_institution}
+                              {participant.delegation_type === "country"
+                                ? participant.preferred_country
+                                : participant.preferred_institution}
                             </p>
                             <p className="text-xs text-muted-foreground">
-                              Committee: {delegate.committee_preference || "Any"}
+                              Committee: {participant.committee_preference || "Any"}
                             </p>
                           </td>
                         )}
-                        {delegateColumns.assignments && (
+                        {participantColumns.assignments && (
                           <td className="px-4 py-3">
-                            {editingId === delegate.id ? (
+                            {editingId === participant.id ? (
                               <div className="space-y-2">
                                 <div className="flex items-center gap-2">
                                   <Flag size={16} className="text-accent" />
@@ -608,21 +608,21 @@ const SystemDashboard = () => {
                             ) : (
                               <div>
                                 <p className="text-foreground">
-                                  Country: {delegate.assigned_country || "Unassigned"}
+                                  Country: {participant.assigned_country || "Unassigned"}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                  Committee: {delegate.assigned_committee || "Unassigned"}
+                                  Committee: {participant.assigned_committee || "Unassigned"}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                  Institution: {delegate.assigned_institution || "N/A"}
+                                  Institution: {participant.assigned_institution || "N/A"}
                                 </p>
                               </div>
                             )}
                           </td>
                         )}
-                        {delegateColumns.status && (
+                        {participantColumns.status && (
                           <td className="px-4 py-3">
-                            {editingId === delegate.id ? (
+                            {editingId === participant.id ? (
                               <select
                                 className="form-input text-sm"
                                 value={editForm.status}
@@ -636,13 +636,13 @@ const SystemDashboard = () => {
                                 <option value="waitlist">Waitlist</option>
                               </select>
                             ) : (
-                              <span className="text-foreground capitalize">{delegate.status}</span>
+                              <span className="text-foreground capitalize">{participant.status}</span>
                             )}
                           </td>
                         )}
-                        {delegateColumns.payment && (
+                        {participantColumns.payment && (
                           <td className="px-4 py-3 capitalize text-foreground">
-                            {editingId === delegate.id ? (
+                            {editingId === participant.id ? (
                               <select
                                 className="form-input text-sm capitalize"
                                 value={editForm.payment_status}
@@ -658,26 +658,26 @@ const SystemDashboard = () => {
                                 <option value="unpaid">Unpaid</option>
                               </select>
                             ) : (
-                              delegate.payment_status || "n/a"
+                              participant.payment_status || "n/a"
                             )}
                           </td>
                         )}
-                        {delegateColumns.notes && (
+                        {participantColumns.notes && (
                           <td className="px-4 py-3 text-muted-foreground">
-                            {delegate.notes || "-"}
+                            {participant.notes || "-"}
                           </td>
                         )}
-                        {delegateColumns.created && (
+                        {participantColumns.created && (
                           <td className="px-4 py-3 text-muted-foreground">
-                            {new Date(delegate.created_at).toLocaleDateString()}
+                            {new Date(participant.created_at).toLocaleDateString()}
                           </td>
                         )}
-                        {delegateColumns.actions && (
+                        {participantColumns.actions && (
                           <td className="px-4 py-3">
-                            {editingId === delegate.id ? (
+                            {editingId === participant.id ? (
                               <div className="flex items-center gap-2">
                                 <button
-                                  onClick={() => handleSave(delegate.id)}
+                                  onClick={() => handleSave(participant.id)}
                                   className="p-1 rounded-md text-accent hover:bg-accent/10"
                                 >
                                   <Check size={18} />
@@ -691,7 +691,7 @@ const SystemDashboard = () => {
                               </div>
                             ) : (
                               <button
-                                onClick={() => handleEdit(delegate)}
+                                onClick={() => handleEdit(participant)}
                                 className="p-1 rounded-md text-accent hover:bg-accent/10"
                               >
                                 <Pencil size={18} />

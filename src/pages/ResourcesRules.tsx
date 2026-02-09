@@ -14,13 +14,13 @@ const ResourcesRules = () => {
   const procedures = [
     { title: 'Points of Information', desc: 'Used in Round 3 to challenge uneconomic statements with logical corrections.' },
     { title: 'Motion to Extend', desc: 'Request additional speaking time from the chair (granted at discretion).' },
-    { title: 'Right of Reply', desc: 'Address misrepresentations of your position made by other delegates.' },
+    { title: 'Right of Reply', desc: 'Address misrepresentations of your position made by other participants.' },
     { title: 'Suspension of Debate', desc: 'Temporary halt for caucus or break (requires chair approval).' },
   ];
 
   return (
     <Layout>
-      <PageHeader title="Rules & Procedures" subtitle="Official conference rules, code of conduct, and procedural guidelines for MWEF delegates." />
+      <PageHeader title="Rules & Procedures" subtitle="Official conference rules, code of conduct, and procedural guidelines for MWEF participants." />
 
       <section className="py-20 bg-background">
         <div className="section-container">
@@ -40,7 +40,7 @@ const ResourcesRules = () => {
                   <Shield className="text-accent" size={28} />
                   <h2 className="text-2xl font-bold text-foreground">Code of Conduct</h2>
                 </div>
-                <p className="text-muted-foreground mb-6">Behavioral expectations, dress code, and ethical guidelines for all delegates and staff.</p>
+                <p className="text-muted-foreground mb-6">Behavioral expectations, dress code, and ethical guidelines for all participants and staff.</p>
                 <button className="btn-outline flex items-center gap-2"><Download size={18} />Download (Coming Soon)</button>
               </motion.div>
             </div>
@@ -48,7 +48,7 @@ const ResourcesRules = () => {
             <div className="space-y-6">
               <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-6">
                 <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2"><AlertTriangle className="text-destructive" size={20} />Important</h3>
-                <p className="text-sm text-muted-foreground">Violations of the code of conduct may result in disqualification. All delegates must read and acknowledge the rules before the conference.</p>
+                <p className="text-sm text-muted-foreground">Violations of the code of conduct may result in disqualification. All participants must read and acknowledge the rules before the conference.</p>
               </div>
             </div>
           </div>

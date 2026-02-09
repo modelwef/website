@@ -76,7 +76,7 @@ const AdminProposals = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Policy Proposals</h2>
-          <p className="text-muted-foreground">Review and manage delegate policy proposals for Round 1.</p>
+          <p className="text-muted-foreground">Review and manage participant policy proposals for Round 1.</p>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <FileText size={18} />

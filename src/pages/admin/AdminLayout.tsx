@@ -16,7 +16,7 @@ import mwefLogo from '@/assets/mwef-logo.png';
 
 const navItems = [
   { name: 'Overview', path: '/admin', icon: LayoutDashboard },
-  { name: 'Delegates', path: '/admin/delegates', icon: Users },
+  { name: 'Participants', path: '/admin/participants', icon: Users },
   { name: 'Partnerships', path: '/admin/partnerships', icon: Building2 },
   { name: 'Volunteers', path: '/admin/volunteers', icon: UserCheck },
   { name: 'Settings', path: '/admin/settings', icon: Settings },

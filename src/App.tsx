@@ -26,7 +26,7 @@ import Dashboard from "./pages/Dashboard";
 
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminOverview from "./pages/admin/AdminOverview";
-import AdminDelegates from "./pages/admin/AdminDelegates";
+import AdminParticipants from "./pages/admin/AdminParticipants";
 import AdminPartnerships from "./pages/admin/AdminPartnerships";
 import AdminVolunteers from "./pages/admin/AdminVolunteers";
 import AdminSettings from "./pages/admin/AdminSettings";
@@ -73,7 +73,7 @@ const App = () => (
 
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminOverview />} />
-            <Route path="delegates" element={<AdminDelegates />} />
+            <Route path="participants" element={<AdminParticipants />} />
             <Route path="partnerships" element={<AdminPartnerships />} />
             <Route path="volunteers" element={<AdminVolunteers />} />
             <Route path="settings" element={<AdminSettings />} />

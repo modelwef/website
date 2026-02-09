@@ -39,11 +39,11 @@ const ResourcesSpeaking = () => {
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-card border border-border rounded-lg p-8" style={{ boxShadow: 'var(--shadow-card)' }}>
                 <div className="flex items-center gap-3 mb-6">
                   <Mic className="text-accent" size={28} />
-                  <h2 className="text-2xl font-bold text-foreground">Delegate Handbook</h2>
+                  <h2 className="text-2xl font-bold text-foreground">Participant Handbook</h2>
                 </div>
-                <p className="text-muted-foreground mb-6">Everything you need to know about participating in MWEF as a delegate, from preparation to conference day.</p>
+                <p className="text-muted-foreground mb-6">Everything you need to know about participating in MWEF as a participant, from preparation to conference day.</p>
                 <ResourceDownloadButton
-                  url={`${resourceBaseUrl}/delegate-handbook.pdf`}
+                  url={`${resourceBaseUrl}/participant-handbook.pdf`}
                   label="Download"
                   variant="outline"
                 />

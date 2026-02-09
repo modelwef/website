@@ -59,7 +59,7 @@ const AdminSettings = () => {
             <h3 className="font-semibold text-foreground">Data Export</h3>
           </div>
           <p className="text-sm text-muted-foreground">
-            Export delegate data, registrations, and reports.
+            Export participant data, registrations, and reports.
           </p>
         </motion.div>
 

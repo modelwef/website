@@ -26,7 +26,7 @@ const navItems: NavItem[] = [
     children: [
       { name: 'Committees', path: '/resources/committees' },
       { name: 'Countries & Institutions', path: '/resources/countries' },
-      { name: 'Delegate Resources', path: '/resources' },
+      { name: 'Participant Resources', path: '/resources' },
       { name: 'Rules & Procedures', path: '/resources/rules' },
     ]
   },

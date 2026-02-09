@@ -4,9 +4,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Users, Building2, UserCheck, Clock, CheckCircle, XCircle } from 'lucide-react';
 
 interface Stats {
-  totalDelegates: number;
-  pendingDelegates: number;
-  approvedDelegates: number;
+  totalParticipants: number;
+  pendingParticipants: number;
+  approvedParticipants: number;
   totalPartnerships: number;
   pendingPartnerships: number;
   totalVolunteers: number;
@@ -15,9 +15,9 @@ interface Stats {
 
 const AdminOverview = () => {
   const [stats, setStats] = useState<Stats>({
-    totalDelegates: 0,
-    pendingDelegates: 0,
-    approvedDelegates: 0,
+    totalParticipants: 0,
+    pendingParticipants: 0,
+    approvedParticipants: 0,
     totalPartnerships: 0,
     pendingPartnerships: 0,
     totalVolunteers: 0,
@@ -28,9 +28,9 @@ const AdminOverview = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Fetch delegate stats
-        const { data: delegates } = await supabase
-          .from('delegate_registrations')
+        // Fetch participant stats
+        const { data: participants } = await supabase
+          .from('participant_registrations')
           .select('status');
         
         // Fetch partnership stats
@@ -44,9 +44,9 @@ const AdminOverview = () => {
           .select('status');
 
         setStats({
-          totalDelegates: delegates?.length || 0,
-          pendingDelegates: delegates?.filter(d => d.status === 'pending').length || 0,
-          approvedDelegates: delegates?.filter(d => d.status === 'approved').length || 0,
+          totalParticipants: participants?.length || 0,
+          pendingParticipants: participants?.filter(d => d.status === 'pending').length || 0,
+          approvedParticipants: participants?.filter(d => d.status === 'approved').length || 0,
           totalPartnerships: partnerships?.length || 0,
           pendingPartnerships: partnerships?.filter(p => p.status === 'pending').length || 0,
           totalVolunteers: volunteers?.length || 0,
@@ -64,20 +64,20 @@ const AdminOverview = () => {
 
   const statCards = [
     {
-      title: 'Total Delegates',
-      value: stats.totalDelegates,
+      title: 'Total Participants',
+      value: stats.totalParticipants,
       icon: Users,
       color: 'bg-blue-100 text-blue-600',
     },
     {
       title: 'Pending Registrations',
-      value: stats.pendingDelegates,
+      value: stats.pendingParticipants,
       icon: Clock,
       color: 'bg-yellow-100 text-yellow-600',
     },
     {
-      title: 'Approved Delegates',
-      value: stats.approvedDelegates,
+      title: 'Approved Participants',
+      value: stats.approvedParticipants,
       icon: CheckCircle,
       color: 'bg-green-100 text-green-600',
     },

@@ -98,7 +98,7 @@ const Countries = () => {
         <div className="section-container text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4 text-primary-foreground">Delegation Assignment</h2>
           <p className="text-white/80 max-w-2xl mx-auto">
-            Country and institutional assignments will be made after registration closes. Delegates can indicate preferences, but final assignments are based on availability and conference balance.
+            Country and institutional assignments will be made after registration closes. Participants can indicate preferences, but final assignments are based on availability and conference balance.
           </p>
         </div>
       </section>

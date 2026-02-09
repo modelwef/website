@@ -45,7 +45,7 @@ export const Footer = () => {
             <h4 className="font-semibold text-lg mb-4 text-accent">Resources</h4>
             <ul className="space-y-2">
               {[
-                { name: 'Delegate Resources', path: '/resources' },
+                { name: 'Participant Resources', path: '/resources' },
                 { name: 'Countries & Institutions', path: '/countries' },
                 { name: 'Get Involved', path: '/get-involved' },
               ].map((link) => (

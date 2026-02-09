@@ -102,6 +102,10 @@ const Conference = () => {
             subtitle="MWEF features three distinct rounds, each testing different aspects of economic reasoning and debate skills."
             center
           />
+          <p className="text-center text-muted-foreground max-w-3xl mx-auto mb-10">
+            The conference starts with policy drafting and solution proposals, then transitions into WSDC-inspired
+            debate rounds where participants test their policies through structured argumentation.
+          </p>
 
           <div className="space-y-8 max-w-4xl mx-auto">
             {rounds.map((round, index) => (

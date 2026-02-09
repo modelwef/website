@@ -8,23 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { User, School, Globe, BookOpen, CreditCard, CheckCircle, ArrowRight, Lock, Eye, EyeOff } from 'lucide-react';
 import { committees } from '@/data/committees';
-import { allCountries, countryCodeByName, institutions } from '@/data/countries';
-
-const countryCodeToFlagUrl = (code: string) =>
-  `https://flagcdn.com/w40/${code.toLowerCase()}.png`;
-
-const getRegionCodes = () => {
-  const intl = Intl as typeof Intl & { supportedValuesOf?: (key: string) => string[] };
-  if (!intl.supportedValuesOf) {
-    return [];
-  }
-  try {
-    return intl.supportedValuesOf('region');
-  } catch (error) {
-    console.warn('Unable to load region codes from Intl.supportedValuesOf:', error);
-    return [];
-  }
-};
+import { institutions } from '@/data/countries';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -35,7 +19,6 @@ const Register = () => {
     school: '',
     grade: '',
     delegationType: 'country',
-    preferredCountry: '',
     preferredInstitution: '',
     committeePreference: '',
     agreeTerms: false,
@@ -46,7 +29,14 @@ const Register = () => {
   const navigate = useNavigate();
   const gradeOptions = useMemo<SearchableSelectOption[]>(
     () =>
-      ['Year 7', 'Year 8', 'Year 9', 'Year 10', 'Year 11', 'Year 12']
+      [
+        'Year 7 / Grade 6',
+        'Year 8 / Grade 7',
+        'Year 9 / Grade 8',
+        'Year 10 / Grade 9',
+        'Year 11 / Grade 10',
+        'Year 12 / Grade 11',
+      ]
         .sort((a, b) => a.localeCompare(b))
         .map((grade) => ({
           value: grade,
@@ -55,54 +45,6 @@ const Register = () => {
         })),
     [],
   );
-  const countryOptions = useMemo<SearchableSelectOption[]>(() => {
-    const displayNames = new Intl.DisplayNames(['en'], { type: 'region' });
-    const options = getRegionCodes()
-      .filter((code) => code.length === 2)
-      .map((code) => {
-        const name = displayNames.of(code);
-        if (!name) {
-          return null;
-        }
-        return {
-          value: name,
-          label: name,
-          icon: (
-            <img
-              src={countryCodeToFlagUrl(code)}
-              alt={`${name} flag`}
-              className="h-4 w-6 shrink-0 rounded-sm object-cover"
-              loading="lazy"
-            />
-          ),
-          searchValue: `${name} ${code}`,
-        };
-      })
-      .filter(Boolean) as SearchableSelectOption[];
-
-    if (options.length > 0) {
-      return options.sort((a, b) => a.label.localeCompare(b.label));
-    }
-
-    return allCountries
-      .map((country) => {
-        const code = countryCodeByName[country];
-        return {
-          value: country,
-          label: country,
-          icon: code ? (
-            <img
-              src={countryCodeToFlagUrl(code)}
-              alt={`${country} flag`}
-              className="h-4 w-6 shrink-0 rounded-sm object-cover"
-              loading="lazy"
-            />
-          ) : null,
-          searchValue: code ? `${country} ${code}` : country,
-        };
-      })
-      .sort((a, b) => a.label.localeCompare(b.label));
-  }, []);
   const institutionOptions = useMemo<SearchableSelectOption[]>(
     () =>
       [...institutions]
@@ -174,7 +116,7 @@ const Register = () => {
       _email: formData.email,
       _password: formData.password,
       _delegation_type: formData.delegationType,
-      _preferred_country: formData.delegationType === 'country' ? formData.preferredCountry : null,
+      _preferred_country: null,
       _preferred_institution: formData.delegationType === 'institution' ? formData.preferredInstitution : null,
       _committee_preference: formData.committeePreference || null,
       _notes: notes,
@@ -366,16 +308,8 @@ const Register = () => {
                     </div>
 
                     {formData.delegationType === 'country' ? (
-                      <div>
-                        <label className="form-label">Preferred Country</label>
-                        <SearchableSelect
-                          value={formData.preferredCountry}
-                          onValueChange={(value) => setFormData({ ...formData, preferredCountry: value })}
-                          options={countryOptions}
-                          placeholder="Select country preference"
-                          searchPlaceholder="Search countries"
-                          emptyMessage="No countries found."
-                        />
+                      <div className="rounded-lg border border-dashed border-border bg-secondary/40 p-4 text-sm text-muted-foreground">
+                        Country assignments are provided by the organizing team based on availability.
                       </div>
                     ) : (
                       <div>

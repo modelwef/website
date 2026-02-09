@@ -58,6 +58,10 @@ const AboutConference = () => {
       <section className="py-20 md:py-28 bg-background">
         <div className="section-container">
           <SectionHeader title="Conference Rounds" subtitle="MWEF features three distinct rounds, each testing different aspects of economic reasoning and debate skills." center />
+          <p className="text-center text-muted-foreground max-w-3xl mx-auto mb-10">
+            The conference begins with policy-making and solution proposals, then moves into WSDC-inspired debate
+            rounds between participants to pressure-test those ideas.
+          </p>
           <div className="space-y-8 max-w-4xl mx-auto">
             {rounds.map((round, index) => (
               <motion.div key={round.number} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: index * 0.1 }} className="bg-card border border-border rounded-lg overflow-hidden" style={{ boxShadow: 'var(--shadow-card)' }}>

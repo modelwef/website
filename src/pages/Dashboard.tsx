@@ -5,7 +5,17 @@ import { Layout } from '@/components/layout/Layout';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { User, FileText, Globe, Calendar, LogOut, BookOpen, Landmark, ListChecks, BadgeCheck } from 'lucide-react';
+import {
+  User,
+  FileText,
+  Globe,
+  Calendar,
+  LogOut,
+  BookOpen,
+  Landmark,
+  ListChecks,
+  BadgeCheck,
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Registration {
@@ -31,6 +41,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [registration, setRegistration] = useState<Registration | null>(null);
   const [loadingReg, setLoadingReg] = useState(true);
+
   const { schoolName, gradeLevel } = useMemo(() => {
     if (!registration?.notes) {
       return { schoolName: 'Not set', gradeLevel: 'Not set' };
@@ -39,6 +50,7 @@ const Dashboard = () => {
     const lines = registration.notes.split('\n');
     const schoolLine = lines.find((line) => line.startsWith('School:'));
     const gradeLine = lines.find((line) => line.startsWith('Grade:'));
+
     return {
       schoolName: schoolLine?.replace('School:', '').trim() || 'Not set',
       gradeLevel: gradeLine?.replace('Grade:', '').trim() || 'Not set',
@@ -54,29 +66,35 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (!user) return;
+
       const registrationEmail = user.email;
       if (!registrationEmail) {
+        setRegistration(null);
         setLoadingReg(false);
         return;
       }
-      
-      // Fetch registration
-      const { data: regData, error: regError } = await supabase
-        .from('participant_registrations')
-        .select('*')
-        .eq('email', registrationEmail)
-        .maybeSingle();
 
-      if (regError) {
-        console.error('Error fetching registration:', regError);
-      } else {
-        setRegistration(regData);
+      try {
+        // Fetch registration via RPC (avoids RLS issues)
+        const { data: regData, error: regError } = await supabase.rpc(
+          'get_participant_registration',
+          { _email: registrationEmail }
+        );
+
+        if (regError) {
+          console.error('Error fetching registration:', regError);
+          setRegistration(null);
+        } else {
+          // RPC returns an array of rows
+          setRegistration((regData?.[0] as Registration) ?? null);
+        }
+      } finally {
+        setLoadingReg(false);
       }
-
-      setLoadingReg(false);
     };
 
     if (user) {
+      setLoadingReg(true);
       fetchData();
     }
   }, [user]);
@@ -99,11 +117,16 @@ const Dashboard = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'approved': return 'bg-green-100 text-green-800 border-green-200';
-      case 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'rejected': return 'bg-red-100 text-red-800 border-red-200';
-      case 'waitlist': return 'bg-blue-100 text-blue-800 border-blue-200';
-      default: return 'bg-muted text-muted-foreground border-border';
+      case 'approved':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'rejected':
+        return 'bg-red-100 text-red-800 border-red-200';
+      case 'waitlist':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      default:
+        return 'bg-muted text-muted-foreground border-border';
     }
   };
 
@@ -111,7 +134,9 @@ const Dashboard = () => {
     <Layout>
       <PageHeader
         title="Participant Dashboard"
-        subtitle={`Welcome back, ${user ? `${user.first_name} ${user.last_name}`.trim() : 'Participant'}!`}
+        subtitle={`Welcome back, ${
+          user ? `${user.first_name} ${user.last_name}`.trim() : 'Participant'
+        }!`}
       />
 
       <section className="py-20 bg-background">
@@ -132,7 +157,7 @@ const Dashboard = () => {
                     Profile Information
                   </h2>
                 </div>
-                
+
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-muted-foreground">Full Name</p>
@@ -179,31 +204,45 @@ const Dashboard = () => {
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
                       <span className="text-muted-foreground">Status:</span>
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(registration.status)}`}>
-                        {registration.status.charAt(0).toUpperCase() + registration.status.slice(1)}
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusColor(
+                          registration.status
+                        )}`}
+                      >
+                        {registration.status.charAt(0).toUpperCase() +
+                          registration.status.slice(1)}
                       </span>
                     </div>
-                    
+
                     <div className="grid md:grid-cols-2 gap-4 pt-4 border-t border-border">
                       <div>
                         <p className="text-sm text-muted-foreground">Delegation Type</p>
-                        <p className="font-medium text-foreground capitalize">{registration.delegation_type}</p>
+                        <p className="font-medium text-foreground capitalize">
+                          {registration.delegation_type}
+                        </p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Preferred {registration.delegation_type === 'country' ? 'Country' : 'Institution'}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Preferred{' '}
+                          {registration.delegation_type === 'country' ? 'Country' : 'Institution'}
+                        </p>
                         <p className="font-medium text-foreground">
-                          {registration.delegation_type === 'country' 
-                            ? registration.preferred_country 
+                          {registration.delegation_type === 'country'
+                            ? registration.preferred_country
                             : registration.preferred_institution || 'Not specified'}
                         </p>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Committee Preference</p>
-                        <p className="font-medium text-foreground">{registration.committee_preference || 'Any'}</p>
+                        <p className="font-medium text-foreground">
+                          {registration.committee_preference || 'Any'}
+                        </p>
                       </div>
                       <div>
                         <p className="text-sm text-muted-foreground">Payment Status</p>
-                        <p className="font-medium text-foreground capitalize">{registration.payment_status}</p>
+                        <p className="font-medium text-foreground capitalize">
+                          {registration.payment_status}
+                        </p>
                       </div>
                     </div>
 
@@ -215,16 +254,23 @@ const Dashboard = () => {
                         </h3>
                         <div className="grid md:grid-cols-2 gap-4">
                           <div>
-                            <p className="text-sm text-muted-foreground">Assigned {registration.delegation_type === 'country' ? 'Country' : 'Institution'}</p>
+                            <p className="text-sm text-muted-foreground">
+                              Assigned{' '}
+                              {registration.delegation_type === 'country'
+                                ? 'Country'
+                                : 'Institution'}
+                            </p>
                             <p className="font-bold text-primary">
-                              {registration.delegation_type === 'country' 
-                                ? registration.assigned_country 
+                              {registration.delegation_type === 'country'
+                                ? registration.assigned_country
                                 : registration.assigned_institution || 'Pending'}
                             </p>
                           </div>
                           <div>
                             <p className="text-sm text-muted-foreground">Assigned Committee</p>
-                            <p className="font-bold text-primary">{registration.assigned_committee || 'Pending'}</p>
+                            <p className="font-bold text-primary">
+                              {registration.assigned_committee || 'Pending'}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -240,7 +286,6 @@ const Dashboard = () => {
                   </div>
                 )}
               </motion.div>
-
             </div>
 
             {/* Sidebar */}
@@ -261,23 +306,33 @@ const Dashboard = () => {
                   <div className="space-y-3 text-sm">
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">Registration</span>
-                      <span className="font-medium text-foreground capitalize">{registration.status}</span>
+                      <span className="font-medium text-foreground capitalize">
+                        {registration.status}
+                      </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">Assigned Country</span>
-                      <span className="font-medium text-foreground">{registration.assigned_country || 'Pending'}</span>
+                      <span className="font-medium text-foreground">
+                        {registration.assigned_country || 'Pending'}
+                      </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">Committee</span>
-                      <span className="font-medium text-foreground">{registration.assigned_committee || 'Pending'}</span>
+                      <span className="font-medium text-foreground">
+                        {registration.assigned_committee || 'Pending'}
+                      </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">Payment</span>
-                      <span className="font-medium text-foreground capitalize">{registration.payment_status || 'Pending'}</span>
+                      <span className="font-medium text-foreground capitalize">
+                        {registration.payment_status || 'Pending'}
+                      </span>
                     </div>
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground">Complete registration to view assignments.</p>
+                  <p className="text-sm text-muted-foreground">
+                    Complete registration to view assignments.
+                  </p>
                 )}
               </motion.div>
 
@@ -359,8 +414,16 @@ const Dashboard = () => {
                   </li>
                   <li className="flex items-center justify-between">
                     <span>Assignment received</span>
-                    <span className={(registration?.assigned_country || registration?.assigned_committee) ? 'text-accent' : 'text-muted-foreground'}>
-                      {(registration?.assigned_country || registration?.assigned_committee) ? 'Done' : 'Pending'}
+                    <span
+                      className={
+                        registration?.assigned_country || registration?.assigned_committee
+                          ? 'text-accent'
+                          : 'text-muted-foreground'
+                      }
+                    >
+                      {registration?.assigned_country || registration?.assigned_committee
+                        ? 'Done'
+                        : 'Pending'}
                     </span>
                   </li>
                 </ul>
